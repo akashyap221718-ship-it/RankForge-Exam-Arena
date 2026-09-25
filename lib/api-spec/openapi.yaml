@@ -18,6 +18,8 @@ tags:
     description: Competitive contest operations
   - name: leaderboard
     description: Ranking operations
+  - name: profile
+    description: Authenticated learner profile operations
 paths:
   /healthz:
     get:
@@ -160,6 +162,35 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Leaderboard"
+  /profile:
+    get:
+      operationId: getProfile
+      tags: [profile]
+      summary: Get the authenticated learner profile
+      responses:
+        "200":
+          description: Learner profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+    patch:
+      operationId: updateProfile
+      tags: [profile]
+      summary: Update the authenticated learner profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileUpdate"
+      responses:
+        "200":
+          description: Updated learner profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
 components:
   schemas:
     HealthStatus:
@@ -309,4 +340,66 @@ components:
         solved: { type: integer }
         isCurrentUser: { type: boolean }
       required: [rank, name, initials, target, rating, solved, isCurrentUser]
+    Profile:
+      type: object
+      properties:
+        fullName: { type: string }
+        username: { type: string }
+        email: { type: string }
+        avatarUrl: { type: ["string", "null"] }
+        phoneNumber: { type: ["string", "null"] }
+        college: { type: ["string", "null"] }
+        course: { type: ["string", "null"] }
+        branch: { type: ["string", "null"] }
+        year: { type: ["string", "null"] }
+        graduationYear: { type: ["integer", "null"] }
+        skills:
+          type: array
+          items: { type: string }
+        programmingLanguages:
+          type: array
+          items: { type: string }
+        interests:
+          type: array
+          items: { type: string }
+        careerGoal: { type: ["string", "null"] }
+        preferredJobRole: { type: ["string", "null"] }
+        learningGoals: { type: ["string", "null"] }
+        skillLevel: { type: ["string", "null"] }
+        targetCompanies:
+          type: array
+          items: { type: string }
+        profileCompletion: { type: integer }
+      required: [fullName, username, email, avatarUrl, phoneNumber, college, course, branch, year, graduationYear, skills, programmingLanguages, interests, careerGoal, preferredJobRole, learningGoals, skillLevel, targetCompanies, profileCompletion]
+    ProfileUpdate:
+      type: object
+      properties:
+        fullName: { type: string, maxLength: 120 }
+        username: { type: string, maxLength: 60 }
+        phoneNumber: { type: ["string", "null"], maxLength: 30 }
+        college: { type: ["string", "null"], maxLength: 160 }
+        course: { type: ["string", "null"], maxLength: 120 }
+        branch: { type: ["string", "null"], maxLength: 120 }
+        year: { type: ["string", "null"], maxLength: 40 }
+        graduationYear: { type: ["integer", "null"], minimum: 1950, maximum: 2200 }
+        skills:
+          type: array
+          items: { type: string, maxLength: 60 }
+          maxItems: 20
+        programmingLanguages:
+          type: array
+          items: { type: string, maxLength: 40 }
+          maxItems: 20
+        interests:
+          type: array
+          items: { type: string, maxLength: 80 }
+          maxItems: 20
+        careerGoal: { type: ["string", "null"], maxLength: 120 }
+        preferredJobRole: { type: ["string", "null"], maxLength: 120 }
+        learningGoals: { type: ["string", "null"], maxLength: 500 }
+        skillLevel: { type: ["string", "null"], maxLength: 40 }
+        targetCompanies:
+          type: array
+          items: { type: string, maxLength: 100 }
+          maxItems: 10
 

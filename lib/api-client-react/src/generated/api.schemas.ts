@@ -123,6 +123,117 @@ export interface Leaderboard {
   entries: LeaderboardEntry[];
 }
 
+export interface Profile {
+  fullName: string;
+  username: string;
+  email: string;
+  /** @nullable */
+  avatarUrl: string | null;
+  /** @nullable */
+  phoneNumber: string | null;
+  /** @nullable */
+  college: string | null;
+  /** @nullable */
+  course: string | null;
+  /** @nullable */
+  branch: string | null;
+  /** @nullable */
+  year: string | null;
+  /** @nullable */
+  graduationYear: number | null;
+  skills: string[];
+  programmingLanguages: string[];
+  interests: string[];
+  /** @nullable */
+  careerGoal: string | null;
+  /** @nullable */
+  preferredJobRole: string | null;
+  /** @nullable */
+  learningGoals: string | null;
+  /** @nullable */
+  skillLevel: string | null;
+  targetCompanies: string[];
+  profileCompletion: number;
+}
+
+export interface ProfileUpdate {
+  /** @maxLength 120 */
+  fullName?: string;
+  /** @maxLength 60 */
+  username?: string;
+  /**
+     * @maxLength 30
+     * @nullable
+     */
+  phoneNumber?: string | null;
+  /**
+     * @maxLength 160
+     * @nullable
+     */
+  college?: string | null;
+  /**
+     * @maxLength 120
+     * @nullable
+     */
+  course?: string | null;
+  /**
+     * @maxLength 120
+     * @nullable
+     */
+  branch?: string | null;
+  /**
+     * @maxLength 40
+     * @nullable
+     */
+  year?: string | null;
+  /**
+     * @minimum 1950
+     * @maximum 2200
+     * @nullable
+     */
+  graduationYear?: number | null;
+  /**
+     * @maxItems 20
+     * @items.maxLength 60
+     */
+  skills?: string[];
+  /**
+     * @maxItems 20
+     * @items.maxLength 40
+     */
+  programmingLanguages?: string[];
+  /**
+     * @maxItems 20
+     * @items.maxLength 80
+     */
+  interests?: string[];
+  /**
+     * @maxLength 120
+     * @nullable
+     */
+  careerGoal?: string | null;
+  /**
+     * @maxLength 120
+     * @nullable
+     */
+  preferredJobRole?: string | null;
+  /**
+     * @maxLength 500
+     * @nullable
+     */
+  learningGoals?: string | null;
+  /**
+     * @maxLength 40
+     * @nullable
+     */
+  skillLevel?: string | null;
+  /**
+     * @maxItems 10
+     * @items.maxLength 100
+     */
+  targetCompanies?: string[];
+}
+
 export type ListQuestionSetsParams = {
 track?: string;
 };

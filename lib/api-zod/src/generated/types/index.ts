@@ -17,6 +17,8 @@ export * from './healthStatus';
 export * from './leaderboard';
 export * from './leaderboardEntry';
 export * from './listQuestionSetsParams';
+export * from './profile';
+export * from './profileUpdate';
 export * from './question';
 export * from './questionSet';
 export * from './track';

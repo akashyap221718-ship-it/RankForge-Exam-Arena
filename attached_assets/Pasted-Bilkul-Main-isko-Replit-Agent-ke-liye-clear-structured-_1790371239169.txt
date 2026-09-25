@@ -1,0 +1,883 @@
+Bilkul. Main isko **Replit Agent ke liye clear, structured, implementation-ready English prompt** mein convert kar raha hoon, taaki woh requirements ko properly samajh sake.
+
+# RankForge — Complete Feature Upgrade & Platform Enhancement
+
+I want to significantly upgrade my existing **RankForge** application. Please inspect the current codebase first and preserve the existing working features unless they conflict with the requirements below.
+
+The goal is to make RankForge a more realistic, personalized, student-focused learning and career platform.
+
+## 1. User Profile — Edit & Personalization
+
+Add a complete **Edit Profile** section where users can customize their academic and learning profile.
+
+Users should be able to edit:
+
+* Full Name
+* Profile Photo
+* Username
+* Email
+* Phone Number (optional)
+* College/University
+* Course/Degree
+* Branch/Specialization
+* Year/Semester
+* Graduation Year
+* Skills
+* Programming Languages
+* Areas of Interest
+* Career Goal
+* Preferred Job Role
+* Learning Goals
+* Current Skill Level
+* Target Companies (optional)
+
+Add suitable categories and dropdowns instead of requiring users to type everything manually.
+
+The profile should help RankForge personalize the user's:
+
+* Learning recommendations
+* Coding problems
+* Engineering study materials
+* Job preparation
+* Interview questions
+* Dashboard statistics
+* Leaderboard information
+
+Add a clean **Profile Completion Percentage** indicator.
+
+---
+
+# 2. Personalized Learning Categories
+
+Create a proper category system based on the information provided by the user.
+
+For example:
+
+### Engineering
+
+* Computer Science & Engineering
+* Electronics & Communication Engineering
+* Electrical Engineering
+* Mechanical Engineering
+* Civil Engineering
+* Information Technology
+* Artificial Intelligence & Machine Learning
+* Data Science
+* Chemical Engineering
+* Biotechnology
+* Other Engineering Branches
+
+### Career Paths
+
+* Software Development
+* Data Analyst
+* Data Engineer
+* Data Scientist
+* Machine Learning Engineer
+* Web Developer
+* App Developer
+* Cloud Engineer
+* Cybersecurity
+* DevOps
+* Embedded Systems
+* VLSI
+* Electronics
+* Core Engineering
+* Other
+
+Users should be able to select multiple interests.
+
+Use these preferences to personalize the content shown on their dashboard.
+
+---
+
+# 3. Latest Jobs / Job Portal Section
+
+Add a dedicated **Jobs** section to RankForge.
+
+The Jobs page should contain:
+
+* Latest job opportunities
+* Internship opportunities
+* Fresher jobs
+* Entry-level jobs
+* Engineering jobs
+* Software jobs
+* Data/AI jobs
+* Core engineering jobs
+* Remote jobs where applicable
+
+Each job card should display:
+
+* Job title
+* Company
+* Location
+* Work type
+* Experience required
+* Required skills
+* Salary/package if publicly available
+* Job description
+* Required qualifications
+* Application deadline if available
+* Apply button
+* Source/link
+
+Add filters for:
+
+* Job role
+* Engineering branch
+* Skills
+* Location
+* Experience
+* Internship/Full-time
+* Remote/On-site/Hybrid
+
+### Important
+
+Do not create fake job listings.
+
+If external job APIs or reliable job feeds are available, integrate them properly.
+
+Otherwise, create a database structure that allows legitimate job listings to be added/updated later.
+
+Clearly show when a job listing was last updated.
+
+---
+
+# 4. Interview Questions for Jobs
+
+For each major job role, create an **Interview Preparation** section.
+
+Example:
+
+### Software Developer
+
+Include categories such as:
+
+* Programming fundamentals
+* Data Structures & Algorithms
+* OOP
+* DBMS
+* Operating Systems
+* Computer Networks
+* SQL
+* System Design basics
+* HR questions
+* Behavioral questions
+* Coding interview questions
+
+### Data Analyst
+
+Include:
+
+* SQL
+* Excel
+* Python
+* Pandas
+* NumPy
+* Statistics
+* Data Visualization
+* Power BI/Tableau
+* Business case studies
+* Interview questions
+
+### Data Engineer
+
+Include:
+
+* SQL
+* Python
+* ETL/ELT
+* Data Warehousing
+* PySpark
+* Airflow
+* Kafka
+* Cloud
+* Databases
+* Distributed systems
+* Data pipeline questions
+
+Similarly create interview preparation content for other major roles.
+
+For coding questions, provide:
+
+* Problem statement
+* Difficulty
+* Topic
+* Input/output format
+* Constraints
+* Example
+* Expected approach
+* Test cases
+
+Do not copy copyrighted interview question banks verbatim. Use original questions or properly licensed/public-domain material.
+
+---
+
+# 5. Remove Bot/Fake Users
+
+The current application may contain dummy/bot users.
+
+Remove all placeholder, fake, test, bot, or automatically generated users from the production user experience.
+
+Only genuine registered users should appear as users on the platform.
+
+Do NOT simply hide fake users from the UI while keeping them as normal leaderboard participants.
+
+Instead:
+
+* Identify test/demo/bot accounts
+* Remove or properly isolate them from production data
+* Keep test data in a separate development/testing environment if needed
+
+Do not delete genuine user accounts.
+
+---
+
+# 6. Real User Leaderboard
+
+Update the leaderboard so that it contains **only real registered users**.
+
+The leaderboard should show:
+
+* Rank
+* Username
+* Profile picture
+* Points
+* Problems solved
+* Courses/materials completed
+* Streak
+* Achievements
+
+Add filters such as:
+
+* Overall
+* Weekly
+* Monthly
+* Branch
+* College
+* Coding
+* Learning
+
+Make sure users cannot manipulate leaderboard scores through simple frontend requests.
+
+Leaderboard scores must be calculated and validated on the backend.
+
+---
+
+# 7. Dashboard Upgrade
+
+Redesign the dashboard around the user's profile and learning goals.
+
+Dashboard should contain:
+
+### Welcome Section
+
+Example:
+
+> Welcome back, [Name]!
+
+### Progress
+
+* Overall learning progress
+* Coding progress
+* Engineering subjects progress
+* Interview preparation progress
+* Job preparation progress
+
+### Recommended For You
+
+Personalized recommendations based on:
+
+* Branch
+* Year
+* Skills
+* Career goal
+* Previous activity
+* Weak topics
+
+### Quick Access
+
+* Continue Learning
+* Coding Problems
+* Jobs
+* Interview Preparation
+* Engineering Materials
+* Leaderboard
+
+### Statistics
+
+* Problems solved
+* Learning hours
+* Courses completed
+* Current streak
+* Points earned
+* Achievements
+
+---
+
+# 8. Dark UI — Complete Website Redesign
+
+Change the application's primary UI from the current white/light design to a modern **dark theme**.
+
+Use a professional dark interface suitable for a coding/education platform.
+
+Suggested design:
+
+* Dark background
+* Dark cards
+* High-contrast text
+* Clear accent colors
+* Modern buttons
+* Smooth hover effects
+* Clean spacing
+* Responsive layout
+
+Do not make the UI unnecessarily flashy.
+
+The design should feel:
+
+* Professional
+* Modern
+* Fast
+* Student-friendly
+* Developer-oriented
+
+Add proper responsive support for:
+
+* Desktop
+* Laptop
+* Tablet
+* Mobile
+
+If practical, provide a theme toggle between:
+
+* Dark Mode
+* Light Mode
+
+But make **Dark Mode the default**.
+
+---
+
+# 9. Feedback & Complaint System
+
+Add a dedicated:
+
+**Feedback & Complaints**
+
+section.
+
+Users should be able to submit:
+
+### Feedback
+
+* General feedback
+* Feature request
+* UI/UX feedback
+* Learning content feedback
+
+### Complaint / Problem
+
+* Website bug
+* Login problem
+* Profile problem
+* Coding problem issue
+* Payment issue
+* Content issue
+* Job listing issue
+* Other
+
+Form fields:
+
+* Category
+* Subject
+* Description
+* Screenshot/attachment (optional)
+* User account automatically attached
+* Date/time automatically recorded
+
+---
+
+# 10. Feedback Storage & Gmail Notification
+
+All feedback and complaints should be stored securely in the database.
+
+Also send an email notification to:
+
+**[akshyap221718@gmail.com](mailto:akshyap221718@gmail.com)**
+
+for every new feedback/complaint.
+
+Important:
+
+* Do not expose the Gmail address publicly in frontend source code.
+* Store email configuration in environment variables/secrets.
+* Never hard-code passwords, API keys, SMTP credentials, or other secrets.
+
+If direct Gmail integration is not appropriate, use a secure email service/API configured through environment variables.
+
+Create an admin interface where I can:
+
+* View complaints
+* View feedback
+* Change status
+* Add internal notes
+* Mark as resolved
+* Filter by category
+* Search submissions
+* View submission date
+* View user information
+
+Statuses:
+
+* New
+* In Progress
+* Resolved
+* Closed
+
+---
+
+# 11. Engineering Section — All Major Branches
+
+Create a comprehensive **Engineering** section.
+
+Include materials for major engineering branches.
+
+### Computer Science / IT
+
+* Programming
+* Data Structures
+* Algorithms
+* DBMS
+* Operating Systems
+* Computer Networks
+* Software Engineering
+* Web Development
+* AI/ML
+* Cloud Computing
+* Cybersecurity
+
+### Electronics & Communication
+
+* Basic Electronics
+* Digital Electronics
+* Analog Electronics
+* Signals & Systems
+* Communication Systems
+* Microprocessors
+* Microcontrollers
+* Embedded Systems
+* VLSI
+* Electromagnetics
+
+### Electrical Engineering
+
+* Circuit Theory
+* Electrical Machines
+* Power Systems
+* Control Systems
+* Power Electronics
+* Measurements
+* Electrical Drives
+
+### Mechanical Engineering
+
+* Engineering Mechanics
+* Thermodynamics
+* Fluid Mechanics
+* Strength of Materials
+* Manufacturing
+* Machine Design
+* Heat Transfer
+* CAD/CAM
+
+### Civil Engineering
+
+* Engineering Mechanics
+* Strength of Materials
+* Structural Engineering
+* Surveying
+* Geotechnical Engineering
+* Transportation Engineering
+* Environmental Engineering
+* Construction Management
+
+### Chemical Engineering
+
+* Chemical Process Calculations
+* Thermodynamics
+* Fluid Mechanics
+* Heat Transfer
+* Mass Transfer
+* Reaction Engineering
+* Process Control
+
+### AI & Data Science
+
+* Python
+* Statistics
+* Machine Learning
+* Deep Learning
+* Data Analysis
+* Data Engineering
+* SQL
+* Data Visualization
+* Big Data
+
+Also provide a scalable database structure so additional branches and subjects can easily be added later.
+
+---
+
+# 12. Engineering Study Material Structure
+
+Each subject should support:
+
+* Notes
+* Topics
+* Subtopics
+* PDF/material resources
+* Important formulas
+* Diagrams
+* Examples
+* Practice questions
+* MCQs
+* Previous-year questions where legally available
+* Progress tracking
+
+Users should be able to mark:
+
+* Completed
+* In Progress
+* Bookmark
+
+Add search and filtering.
+
+---
+
+# 13. Coding Problems Section
+
+Create a dedicated **Coding Practice** platform.
+
+Support:
+
+### Languages
+
+* C
+* C++
+* Python
+* Java
+* JavaScript
+* SQL
+
+### Topics
+
+* Basics
+* Variables
+* Loops
+* Functions
+* Recursion
+* Arrays
+* Strings
+* Hashing
+* Sorting
+* Searching
+* Linked Lists
+* Stack
+* Queue
+* Trees
+* Graphs
+* Dynamic Programming
+* Greedy
+* Two Pointers
+* Sliding Window
+* SQL
+
+### Difficulty
+
+* Easy
+* Medium
+* Hard
+
+Each problem should contain:
+
+* Problem statement
+* Examples
+* Constraints
+* Test cases
+* Difficulty
+* Topic
+* Supported languages
+* User submission
+* Result
+* Points
+* Solved status
+
+Track:
+
+* Problems attempted
+* Problems solved
+* Accuracy
+* Difficulty-wise progress
+* Coding streak
+
+---
+
+# 14. Secure Coding Evaluation
+
+Do not execute arbitrary user-submitted code directly on the main application server.
+
+Use a secure sandbox/containerized execution environment for code execution.
+
+Implement:
+
+* Time limits
+* Memory limits
+* Restricted filesystem access
+* Process isolation
+* Network restrictions
+* Submission limits where appropriate
+
+Never allow submitted code to access application secrets, database credentials, or the host system.
+
+---
+
+# 15. Database Architecture
+
+Review the existing database and create/update appropriate models for:
+
+* Users
+* Profiles
+* Branches
+* Courses
+* Subjects
+* Topics
+* Study Materials
+* Coding Problems
+* Coding Submissions
+* Jobs
+* Job Skills
+* Interview Questions
+* User Progress
+* Achievements
+* Leaderboard
+* Feedback
+* Complaints
+* Notifications
+
+Use proper relationships and indexes.
+
+Avoid duplicated data.
+
+---
+
+# 16. Authentication & Authorization
+
+Ensure proper authentication.
+
+Users should only be able to edit their own profile and personal data.
+
+Create appropriate roles:
+
+### User
+
+Can:
+
+* Edit own profile
+* Learn
+* Solve coding problems
+* Apply through job links
+* Submit feedback
+* View leaderboard
+
+### Admin
+
+Can:
+
+* Manage users
+* Manage engineering content
+* Manage coding problems
+* Manage jobs
+* Manage interview questions
+* Manage feedback/complaints
+* Manage leaderboard rules
+
+Do not expose admin functionality to normal users.
+
+---
+
+# 17. Privacy & Data Protection
+
+Handle user information securely.
+
+Implement:
+
+* Password hashing
+* Secure authentication
+* Authorization checks
+* Input validation
+* Rate limiting where appropriate
+* Protection against SQL injection
+* XSS protection
+* CSRF protection where applicable
+* Secure file uploads
+* Environment variables for secrets
+
+Do not expose private user information on public leaderboards.
+
+---
+
+# 18. Search
+
+Add a global search feature.
+
+Users should be able to search:
+
+* Engineering subjects
+* Study materials
+* Coding problems
+* Jobs
+* Interview questions
+* Skills
+* Courses
+
+Search results should be categorized.
+
+---
+
+# 19. Notifications
+
+Add an in-app notification system for:
+
+* New recommended material
+* New coding problems
+* Job updates
+* Interview preparation updates
+* Achievements
+* Leaderboard changes
+* Feedback/complaint status updates
+
+---
+
+# 20. Performance & Code Quality
+
+Before completing the implementation:
+
+* Inspect the existing codebase
+* Reuse existing components where possible
+* Avoid unnecessary rewrites
+* Remove duplicate code
+* Fix existing bugs that affect these features
+* Optimize database queries
+* Add proper loading states
+* Add empty states
+* Add error handling
+* Add form validation
+* Make the UI responsive
+* Ensure accessibility where practical
+
+Do not break existing working features.
+
+---
+
+# 21. Admin Dashboard
+
+Create a proper admin dashboard with:
+
+### User Management
+
+* Real user count
+* Active users
+* User search
+* User details
+* Account management
+
+### Content Management
+
+* Engineering branches
+* Subjects
+* Materials
+* Coding problems
+* Interview questions
+* Jobs
+
+### Feedback Management
+
+* Feedback
+* Complaints
+* Status
+* Search/filter
+
+### Platform Analytics
+
+* Total users
+* Active users
+* Problems solved
+* Materials completed
+* Most popular subjects
+* Most attempted coding topics
+* Job views/applications where trackable
+
+---
+
+# 22. Important Requirement About "Real Users"
+
+Do not create fake users just to make the platform appear active.
+
+Do not artificially increase:
+
+* User count
+* Leaderboard participants
+* Problems solved
+* Likes
+* Activity
+* Rankings
+
+All displayed statistics should come from genuine application activity or clearly labeled sample/demo data in development mode.
+
+---
+
+# 23. Final Implementation Requirements
+
+Before finishing:
+
+1. Inspect the current RankForge project structure.
+2. Identify the existing frontend, backend, database, authentication, and UI framework.
+3. Preserve existing functionality.
+4. Implement the features above using the existing architecture where practical.
+5. Remove production dummy/bot users.
+6. Convert the UI to a modern dark-first design.
+7. Make the profile system highly customizable.
+8. Add personalized learning.
+9. Add Jobs and Interview Preparation.
+10. Add engineering materials for all major branches.
+11. Add coding practice.
+12. Add real-user leaderboard.
+13. Add feedback and complaint management.
+14. Configure email notifications securely.
+15. Create/update database models and migrations.
+16. Test authentication and authorization.
+17. Test all forms and API endpoints.
+18. Test responsive UI.
+19. Fix console errors and broken routes.
+20. Ensure no API keys, passwords, database credentials, or other secrets are exposed.
+21. Provide a clear summary of all changes made.
+22. Provide any required environment variables in a `.env.example` file.
+23. Provide database migration/setup instructions.
+24. Ensure the application can be run successfully on Replit.
+
+## Priority
+
+If everything cannot be implemented at once, prioritize in this order:
+
+1. Real user authentication/profile system
+2. Real-user leaderboard
+3. Dark UI redesign
+4. Engineering materials
+5. Coding practice
+6. Jobs
+7. Interview questions
+8. Feedback/complaint system
+9. Personalization/recommendation system
+10. Advanced analytics and notifications
+
+Build this as a **production-ready student learning and career platform**, not as a static demo.

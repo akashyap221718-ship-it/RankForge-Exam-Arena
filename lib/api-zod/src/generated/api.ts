@@ -179,3 +179,117 @@ export const GetLeaderboardResponse = zod.object({
 })
 
 
+/**
+ * @summary Get the authenticated learner profile
+ */
+export const GetProfileResponse = zod.object({
+  "fullName": zod.string(),
+  "username": zod.string(),
+  "email": zod.string(),
+  "avatarUrl": zod.string().nullable(),
+  "phoneNumber": zod.string().nullable(),
+  "college": zod.string().nullable(),
+  "course": zod.string().nullable(),
+  "branch": zod.string().nullable(),
+  "year": zod.string().nullable(),
+  "graduationYear": zod.number().int().nullable(),
+  "skills": zod.array(zod.string()),
+  "programmingLanguages": zod.array(zod.string()),
+  "interests": zod.array(zod.string()),
+  "careerGoal": zod.string().nullable(),
+  "preferredJobRole": zod.string().nullable(),
+  "learningGoals": zod.string().nullable(),
+  "skillLevel": zod.string().nullable(),
+  "targetCompanies": zod.array(zod.string()),
+  "profileCompletion": zod.number().int()
+})
+
+
+/**
+ * @summary Update the authenticated learner profile
+ */
+export const updateProfileBodyFullNameMax = 120;
+
+export const updateProfileBodyUsernameMax = 60;
+
+export const updateProfileBodyPhoneNumberMax = 30;
+
+export const updateProfileBodyCollegeMax = 160;
+
+export const updateProfileBodyCourseMax = 120;
+
+export const updateProfileBodyBranchMax = 120;
+
+export const updateProfileBodyYearMax = 40;
+
+export const updateProfileBodyGraduationYearMin = 1950;
+export const updateProfileBodyGraduationYearMax = 2200;
+
+export const updateProfileBodySkillsItemMax = 60;
+
+export const updateProfileBodySkillsMax = 20;
+
+export const updateProfileBodyProgrammingLanguagesItemMax = 40;
+
+export const updateProfileBodyProgrammingLanguagesMax = 20;
+
+export const updateProfileBodyInterestsItemMax = 80;
+
+export const updateProfileBodyInterestsMax = 20;
+
+export const updateProfileBodyCareerGoalMax = 120;
+
+export const updateProfileBodyPreferredJobRoleMax = 120;
+
+export const updateProfileBodyLearningGoalsMax = 500;
+
+export const updateProfileBodySkillLevelMax = 40;
+
+export const updateProfileBodyTargetCompaniesItemMax = 100;
+
+export const updateProfileBodyTargetCompaniesMax = 10;
+
+
+
+export const UpdateProfileBody = zod.object({
+  "fullName": zod.string().max(updateProfileBodyFullNameMax).optional(),
+  "username": zod.string().max(updateProfileBodyUsernameMax).optional(),
+  "phoneNumber": zod.string().max(updateProfileBodyPhoneNumberMax).nullish(),
+  "college": zod.string().max(updateProfileBodyCollegeMax).nullish(),
+  "course": zod.string().max(updateProfileBodyCourseMax).nullish(),
+  "branch": zod.string().max(updateProfileBodyBranchMax).nullish(),
+  "year": zod.string().max(updateProfileBodyYearMax).nullish(),
+  "graduationYear": zod.number().int().min(updateProfileBodyGraduationYearMin).max(updateProfileBodyGraduationYearMax).nullish(),
+  "skills": zod.array(zod.string().max(updateProfileBodySkillsItemMax)).max(updateProfileBodySkillsMax).optional(),
+  "programmingLanguages": zod.array(zod.string().max(updateProfileBodyProgrammingLanguagesItemMax)).max(updateProfileBodyProgrammingLanguagesMax).optional(),
+  "interests": zod.array(zod.string().max(updateProfileBodyInterestsItemMax)).max(updateProfileBodyInterestsMax).optional(),
+  "careerGoal": zod.string().max(updateProfileBodyCareerGoalMax).nullish(),
+  "preferredJobRole": zod.string().max(updateProfileBodyPreferredJobRoleMax).nullish(),
+  "learningGoals": zod.string().max(updateProfileBodyLearningGoalsMax).nullish(),
+  "skillLevel": zod.string().max(updateProfileBodySkillLevelMax).nullish(),
+  "targetCompanies": zod.array(zod.string().max(updateProfileBodyTargetCompaniesItemMax)).max(updateProfileBodyTargetCompaniesMax).optional()
+})
+
+export const UpdateProfileResponse = zod.object({
+  "fullName": zod.string(),
+  "username": zod.string(),
+  "email": zod.string(),
+  "avatarUrl": zod.string().nullable(),
+  "phoneNumber": zod.string().nullable(),
+  "college": zod.string().nullable(),
+  "course": zod.string().nullable(),
+  "branch": zod.string().nullable(),
+  "year": zod.string().nullable(),
+  "graduationYear": zod.number().int().nullable(),
+  "skills": zod.array(zod.string()),
+  "programmingLanguages": zod.array(zod.string()),
+  "interests": zod.array(zod.string()),
+  "careerGoal": zod.string().nullable(),
+  "preferredJobRole": zod.string().nullable(),
+  "learningGoals": zod.string().nullable(),
+  "skillLevel": zod.string().nullable(),
+  "targetCompanies": zod.array(zod.string()),
+  "profileCompletion": zod.number().int()
+})
+
+
