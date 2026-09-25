@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "RankForge Exam Arena"
+description = "A competitive exam practice arena for government-job aspirants and engineering students, with curated question sets, timed contests, progress insights, and a live rank dashboard."
+version = "1.0.0"
+id = "artifacts/rankforge-exam-arena"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21213
+
+[services.development]
+run = "pnpm --filter @workspace/rankforge-exam-arena run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/rankforge-exam-arena", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/rankforge-exam-arena/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21213"
+BASE_PATH = "/"

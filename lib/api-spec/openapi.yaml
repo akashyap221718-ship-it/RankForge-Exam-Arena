@@ -10,6 +10,14 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: dashboard
+    description: Learner dashboard operations
+  - name: practice
+    description: Practice and question-set operations
+  - name: contests
+    description: Competitive contest operations
+  - name: leaderboard
+    description: Ranking operations
 paths:
   /healthz:
     get:
@@ -24,6 +32,134 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /dashboard:
+    get:
+      operationId: getDashboard
+      tags: [dashboard]
+      summary: Get learner dashboard
+      responses:
+        "200":
+          description: Dashboard snapshot
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dashboard"
+  /tracks:
+    get:
+      operationId: listTracks
+      tags: [practice]
+      summary: List exam tracks
+      responses:
+        "200":
+          description: Available exam tracks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Track"
+  /question-sets:
+    get:
+      operationId: listQuestionSets
+      tags: [practice]
+      summary: List recommended question sets
+      parameters:
+        - name: track
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Question sets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/QuestionSet"
+  /questions/{id}:
+    get:
+      operationId: getQuestion
+      tags: [practice]
+      summary: Get a question
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Question detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Question"
+        "404":
+          description: Question not found
+  /attempts:
+    post:
+      operationId: submitAttempt
+      tags: [practice]
+      summary: Submit an answer attempt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AttemptInput"
+      responses:
+        "201":
+          description: Attempt result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AttemptResult"
+  /contests:
+    get:
+      operationId: listContests
+      tags: [contests]
+      summary: List upcoming contests
+      responses:
+        "200":
+          description: Contests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Contest"
+  /contests/{id}/join:
+    post:
+      operationId: joinContest
+      tags: [contests]
+      summary: Join a contest
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Joined contest
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contest"
+  /leaderboard:
+    get:
+      operationId: getLeaderboard
+      tags: [leaderboard]
+      summary: Get global leaderboard
+      responses:
+        "200":
+          description: Leaderboard snapshot
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Leaderboard"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +169,144 @@ components:
           type: string
       required:
         - status
+    Dashboard:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/UserProfile"
+        stats:
+          $ref: "#/components/schemas/DashboardStats"
+        focus:
+          type: array
+          items:
+            $ref: "#/components/schemas/FocusTopic"
+        recentActivity:
+          type: array
+          items:
+            $ref: "#/components/schemas/Activity"
+      required: [user, stats, focus, recentActivity]
+    UserProfile:
+      type: object
+      properties:
+        name: { type: string }
+        initials: { type: string }
+        target: { type: string }
+        streak: { type: integer }
+        rank: { type: integer }
+        percentile: { type: number }
+      required: [name, initials, target, streak, rank, percentile]
+    DashboardStats:
+      type: object
+      properties:
+        solved: { type: integer }
+        accuracy: { type: number }
+        rating: { type: integer }
+        hours: { type: number }
+        solvedDelta: { type: integer }
+        accuracyDelta: { type: number }
+        ratingDelta: { type: integer }
+        hoursDelta: { type: number }
+      required: [solved, accuracy, rating, hours, solvedDelta, accuracyDelta, ratingDelta, hoursDelta]
+    FocusTopic:
+      type: object
+      properties:
+        name: { type: string }
+        subtitle: { type: string }
+        progress: { type: integer }
+        color: { type: string }
+      required: [name, subtitle, progress, color]
+    Activity:
+      type: object
+      properties:
+        title: { type: string }
+        meta: { type: string }
+        points: { type: integer }
+        kind: { type: string }
+      required: [title, meta, points, kind]
+    Track:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        shortName: { type: string }
+        description: { type: string }
+        questionCount: { type: integer }
+        color: { type: string }
+      required: [id, name, shortName, description, questionCount, color]
+    QuestionSet:
+      type: object
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        subtitle: { type: string }
+        track: { type: string }
+        difficulty: { type: string }
+        questions: { type: integer }
+        duration: { type: integer }
+        completion: { type: integer }
+        accent: { type: string }
+      required: [id, title, subtitle, track, difficulty, questions, duration, completion, accent]
+    Question:
+      type: object
+      properties:
+        id: { type: integer }
+        setId: { type: integer }
+        title: { type: string }
+        prompt: { type: string }
+        options:
+          type: array
+          items: { type: string }
+        answer: { type: integer }
+        explanation: { type: string }
+        topic: { type: string }
+        difficulty: { type: string }
+      required: [id, setId, title, prompt, options, answer, explanation, topic, difficulty]
+    AttemptInput:
+      type: object
+      properties:
+        questionId: { type: integer }
+        selectedOption: { type: integer }
+        secondsSpent: { type: integer }
+      required: [questionId, selectedOption, secondsSpent]
+    AttemptResult:
+      type: object
+      properties:
+        correct: { type: boolean }
+        points: { type: integer }
+        explanation: { type: string }
+        newRating: { type: integer }
+      required: [correct, points, explanation, newRating]
+    Contest:
+      type: object
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        subtitle: { type: string }
+        startsAt: { type: string }
+        duration: { type: integer }
+        participants: { type: integer }
+        status: { type: string }
+        accent: { type: string }
+      required: [id, title, subtitle, startsAt, duration, participants, status, accent]
+    Leaderboard:
+      type: object
+      properties:
+        userRank: { type: integer }
+        totalUsers: { type: integer }
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/LeaderboardEntry"
+      required: [userRank, totalUsers, entries]
+    LeaderboardEntry:
+      type: object
+      properties:
+        rank: { type: integer }
+        name: { type: string }
+        initials: { type: string }
+        target: { type: string }
+        rating: { type: integer }
+        solved: { type: integer }
+        isCurrentUser: { type: boolean }
+      required: [rank, name, initials, target, rating, solved, isCurrentUser]
 

@@ -1,6 +1,6 @@
-# [Project name]
+# RankForge Exam Arena
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+RankForge is a competitive practice arena for government-job aspirants and engineering students, with exam tracks, timed practice, contests, explanations, streaks, and rank progression.
 
 ## Run & Operate
 
@@ -22,15 +22,26 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/rankforge-exam-arena/src/` — responsive React/Vite application, routes, UI shell, and theme
+- `artifacts/api-server/src/routes/exam-arena.ts` — seeded exam tracks, question sets, questions, contests, attempts, and leaderboard endpoints
+- `lib/api-spec/openapi.yaml` — source-of-truth API contract used to generate client hooks
+- `lib/api-client-react/src/generated/` — generated React Query client and schemas
+- `artifacts/rankforge-exam-arena/src/index.css` — shared color tokens, typography, and motion helpers
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The product is organized around an exam-training loop: dashboard signal → focused set → scored attempt → visible rank feedback.
+- The first release uses seeded API data and in-memory attempt/contest state so the experience is usable immediately without account setup.
+- Frontend API calls use generated hooks from the OpenAPI contract rather than hand-written fetch calls.
+- The visual system uses an indigo training-room foundation with brass rank signals, calibration-blue surfaces, and mono metadata to distinguish exam data from rewards.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Overview dashboard with global rank, percentile, rating, solved count, accuracy, focus hours, streak, focus topics, activity feed, and recommended next practice.
+- Practice room with exam tracks, searchable question sets, difficulty filters, completion progress, timed solving, correctness feedback, explanations, and rating changes.
+- Contests page with live/upcoming states and join actions.
+- Leaderboard page with global rank, targets, ratings, solved counts, search, and current learner highlighting.
+- Settings page for target exam and daily focus preferences.
 
 ## User preferences
 
@@ -38,7 +49,9 @@ _Populate as you build — explicit user instructions worth remembering across s
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- After changing `lib/api-spec/openapi.yaml`, run `pnpm --filter @workspace/api-spec run codegen`.
+- The frontend and API are separate managed workflows; restart both after route or client changes.
+- The shared API uses `/api` and the web app is served at `/`.
 
 ## Pointers
 
