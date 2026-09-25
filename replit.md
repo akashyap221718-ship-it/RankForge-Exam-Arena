@@ -24,6 +24,7 @@ RankForge is a competitive practice arena for government-job aspirants and engin
 
 - `artifacts/rankforge-exam-arena/src/` — responsive React/Vite application, routes, UI shell, and theme
 - `artifacts/api-server/src/routes/exam-arena.ts` — seeded exam tracks, question sets, questions, contests, attempts, and leaderboard endpoints
+- `artifacts/api-server/src/middlewares/clerkProxyMiddleware.ts` — production Clerk proxy support
 - `lib/api-spec/openapi.yaml` — source-of-truth API contract used to generate client hooks
 - `lib/api-client-react/src/generated/` — generated React Query client and schemas
 - `artifacts/rankforge-exam-arena/src/index.css` — shared color tokens, typography, and motion helpers
@@ -33,6 +34,7 @@ RankForge is a competitive practice arena for government-job aspirants and engin
 - The product is organized around an exam-training loop: dashboard signal → focused set → scored attempt → visible rank feedback.
 - The first release uses seeded API data and in-memory attempt/contest state so the experience is usable immediately without account setup.
 - Frontend API calls use generated hooks from the OpenAPI contract rather than hand-written fetch calls.
+- Clerk is the managed authentication provider; the browser uses same-origin session cookies and the API validates sessions with Clerk middleware.
 - The visual system uses an indigo training-room foundation with brass rank signals, calibration-blue surfaces, and mono metadata to distinguish exam data from rewards.
 
 ## Product
@@ -52,6 +54,7 @@ _Populate as you build — explicit user instructions worth remembering across s
 - After changing `lib/api-spec/openapi.yaml`, run `pnpm --filter @workspace/api-spec run codegen`.
 - The frontend and API are separate managed workflows; restart both after route or client changes.
 - The shared API uses `/api` and the web app is served at `/`.
+- Clerk development keys are expected in preview; production keys are provisioned automatically on publish.
 
 ## Pointers
 

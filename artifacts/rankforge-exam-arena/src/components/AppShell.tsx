@@ -2,6 +2,7 @@ import { type ReactNode, useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { BookOpenCheck, ChevronRight, Flame, LayoutDashboard, Menu, Settings2, Shield, Swords, Trophy, X } from 'lucide-react';
 import { getHealthCheckQueryKey, useHealthCheck } from '@workspace/api-client-react';
+import { useClerk, useUser } from '@clerk/react';
 
 const navItems = [
   { href: '/', label: 'Overview', icon: LayoutDashboard },
@@ -9,6 +10,32 @@ const navItems = [
   { href: '/contests', label: 'Contests', icon: Swords },
   { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
 ];
+
+function AccountPanel({ mobile = false }: { mobile?: boolean }) {
+  const { user } = useUser();
+  const { signOut } = useClerk();
+  const name = user?.firstName || user?.username || 'Learner';
+  const email = user?.primaryEmailAddress?.emailAddress || 'Signed-in learner';
+  const initials = `${user?.firstName?.[0] ?? ''}${user?.lastName?.[0] ?? ''}` || name.slice(0, 2).toUpperCase();
+
+  return (
+    <div className={`flex items-center gap-3 rounded-xl border border-sidebar-border bg-sidebar-accent/70 p-3 ${mobile ? 'text-sidebar-foreground' : ''}`}>
+      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent text-xs font-extrabold text-accent-foreground">{initials}</div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-xs font-bold text-white">{name}</p>
+        <p className="truncate text-[10px] text-sidebar-foreground/55">{email}</p>
+      </div>
+      <button
+        type="button"
+        onClick={() => signOut({ redirectUrl: '/' })}
+        data-testid={mobile ? 'button-mobile-sign-out' : 'button-sign-out'}
+        className="rounded-lg px-2 py-1.5 font-mono-ui text-[9px] uppercase tracking-wider text-sidebar-foreground/60 transition-colors hover:bg-sidebar-accent hover:text-accent"
+      >
+        Exit
+      </button>
+    </div>
+  );
+}
 
 export function AppShell({ children }: { children: ReactNode }) {
   const [location] = useLocation();
@@ -58,6 +85,9 @@ export function AppShell({ children }: { children: ReactNode }) {
               Start a set <ChevronRight className="h-3.5 w-3.5" />
             </Link>
           </div>
+          <div className="mt-3">
+            <AccountPanel />
+          </div>
           <Link href="/settings" data-testid="link-nav-settings" className="mt-3 flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-white">
             <Settings2 className="h-[18px] w-[18px]" /> Settings
           </Link>
@@ -90,6 +120,9 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </Link>
               ))}
             </nav>
+           <div className="mt-auto p-4">
+             <AccountPanel mobile />
+           </div>
           </aside>
         </div>
       )}
