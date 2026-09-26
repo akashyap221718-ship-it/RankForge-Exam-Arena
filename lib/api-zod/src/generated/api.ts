@@ -293,3 +293,151 @@ export const UpdateProfileResponse = zod.object({
 })
 
 
+/**
+ * @summary List verified job listings
+ */
+export const ListJobsQueryParams = zod.object({
+  "search": zod.coerce.string().optional(),
+  "workType": zod.coerce.string().optional(),
+  "location": zod.coerce.string().optional()
+})
+
+export const ListJobsResponseItem = zod.object({
+  "id": zod.number().int(),
+  "title": zod.string(),
+  "company": zod.string(),
+  "location": zod.string(),
+  "workType": zod.string(),
+  "experienceRequired": zod.string(),
+  "requiredSkills": zod.array(zod.string()),
+  "salary": zod.string().nullable(),
+  "description": zod.string(),
+  "qualifications": zod.string(),
+  "applicationDeadline": zod.string().nullable(),
+  "sourceUrl": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListJobsResponse = zod.array(ListJobsResponseItem)
+
+
+/**
+ * @summary List engineering study materials
+ */
+export const ListEngineeringMaterialsQueryParams = zod.object({
+  "branch": zod.coerce.string().optional()
+})
+
+export const ListEngineeringMaterialsResponseItem = zod.object({
+  "id": zod.number().int(),
+  "branch": zod.string(),
+  "subject": zod.string(),
+  "title": zod.string(),
+  "materialType": zod.string(),
+  "summary": zod.string(),
+  "topics": zod.array(zod.string())
+})
+export const ListEngineeringMaterialsResponse = zod.array(ListEngineeringMaterialsResponseItem)
+
+
+/**
+ * @summary List interview preparation roles
+ */
+export const ListInterviewRolesResponseItem = zod.object({
+  "role": zod.string(),
+  "questionCount": zod.number().int(),
+  "categories": zod.array(zod.string())
+})
+export const ListInterviewRolesResponse = zod.array(ListInterviewRolesResponseItem)
+
+
+/**
+ * @summary List interview questions
+ */
+export const ListInterviewQuestionsQueryParams = zod.object({
+  "role": zod.coerce.string().optional()
+})
+
+export const ListInterviewQuestionsResponseItem = zod.object({
+  "id": zod.number().int(),
+  "role": zod.string(),
+  "category": zod.string(),
+  "prompt": zod.string(),
+  "difficulty": zod.string(),
+  "answerGuide": zod.string()
+})
+export const ListInterviewQuestionsResponse = zod.array(ListInterviewQuestionsResponseItem)
+
+
+/**
+ * @summary List coding practice problems
+ */
+export const ListCodingProblemsQueryParams = zod.object({
+  "difficulty": zod.coerce.string().optional(),
+  "topic": zod.coerce.string().optional()
+})
+
+export const ListCodingProblemsResponseItem = zod.object({
+  "id": zod.number().int(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "statement": zod.string(),
+  "difficulty": zod.string(),
+  "topic": zod.string(),
+  "supportedLanguages": zod.array(zod.string()),
+  "examples": zod.string(),
+  "constraints": zod.string(),
+  "expectedApproach": zod.string()
+})
+export const ListCodingProblemsResponse = zod.array(ListCodingProblemsResponseItem)
+
+
+/**
+ * @summary Store a coding solution for secure evaluation
+ */
+export const submitCodingSolutionBodySourceCodeMax = 20000;
+
+
+
+export const SubmitCodingSolutionBody = zod.object({
+  "problemId": zod.number().int(),
+  "language": zod.string(),
+  "sourceCode": zod.string().max(submitCodingSolutionBodySourceCodeMax)
+})
+
+export const SubmitCodingSolutionResponse = zod.object({
+  "accepted": zod.boolean(),
+  "status": zod.string(),
+  "message": zod.string()
+})
+
+
+/**
+ * @summary Submit feedback or a complaint
+ */
+export const createFeedbackBodyCategoryMax = 80;
+
+export const createFeedbackBodySubjectMax = 160;
+
+export const createFeedbackBodyDescriptionMax = 5000;
+
+export const createFeedbackBodyAttachmentUrlMax = 500;
+
+
+
+export const CreateFeedbackBody = zod.object({
+  "category": zod.string().max(createFeedbackBodyCategoryMax),
+  "subject": zod.string().max(createFeedbackBodySubjectMax),
+  "description": zod.string().max(createFeedbackBodyDescriptionMax),
+  "attachmentUrl": zod.string().max(createFeedbackBodyAttachmentUrlMax).nullish()
+})
+
+export const CreateFeedbackResponse = zod.object({
+  "id": zod.number().int(),
+  "category": zod.string(),
+  "subject": zod.string(),
+  "description": zod.string(),
+  "status": zod.string(),
+  "createdAt": zod.string()
+})
+
+

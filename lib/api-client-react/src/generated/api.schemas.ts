@@ -234,7 +234,118 @@ export interface ProfileUpdate {
   targetCompanies?: string[];
 }
 
+export interface Job {
+  id: number;
+  title: string;
+  company: string;
+  location: string;
+  workType: string;
+  experienceRequired: string;
+  requiredSkills: string[];
+  /** @nullable */
+  salary: string | null;
+  description: string;
+  qualifications: string;
+  /** @nullable */
+  applicationDeadline: string | null;
+  sourceUrl: string;
+  updatedAt: string;
+}
+
+export interface EngineeringMaterial {
+  id: number;
+  branch: string;
+  subject: string;
+  title: string;
+  materialType: string;
+  summary: string;
+  topics: string[];
+}
+
+export interface InterviewRole {
+  role: string;
+  questionCount: number;
+  categories: string[];
+}
+
+export interface InterviewQuestion {
+  id: number;
+  role: string;
+  category: string;
+  prompt: string;
+  difficulty: string;
+  answerGuide: string;
+}
+
+export interface CodingProblem {
+  id: number;
+  slug: string;
+  title: string;
+  statement: string;
+  difficulty: string;
+  topic: string;
+  supportedLanguages: string[];
+  examples: string;
+  constraints: string;
+  expectedApproach: string;
+}
+
+export interface CodingSubmissionInput {
+  problemId: number;
+  language: string;
+  /** @maxLength 20000 */
+  sourceCode: string;
+}
+
+export interface CodingSubmissionResult {
+  accepted: boolean;
+  status: string;
+  message: string;
+}
+
+export interface FeedbackInput {
+  /** @maxLength 80 */
+  category: string;
+  /** @maxLength 160 */
+  subject: string;
+  /** @maxLength 5000 */
+  description: string;
+  /**
+     * @maxLength 500
+     * @nullable
+     */
+  attachmentUrl?: string | null;
+}
+
+export interface Feedback {
+  id: number;
+  category: string;
+  subject: string;
+  description: string;
+  status: string;
+  createdAt: string;
+}
+
 export type ListQuestionSetsParams = {
 track?: string;
+};
+
+export type ListJobsParams = {
+search?: string;
+workType?: string;
+location?: string;
+};
+
+export type ListEngineeringMaterialsParams = {
+branch?: string;
+};
+
+export type ListInterviewQuestionsParams = {
+role?: string;
+};
+
+export type ListCodingProblemsParams = {
+difficulty?: string;
+topic?: string;
 };
 

@@ -1,5 +1,7 @@
 import { Router, type IRouter } from "express";
 import { getAuth } from "@clerk/express";
+import { db, learnerProfilesTable, learnerStatsTable, practiceAttemptsTable } from "@workspace/db";
+import { asc, desc, eq } from "drizzle-orm";
 import {
   GetDashboardResponse,
   GetQuestionParams,
@@ -14,6 +16,7 @@ import {
   SubmitAttemptBody,
   SubmitAttemptResponse,
 } from "@workspace/api-zod";
+import { ensureLearnerProfile, ensureLearnerStats, getAuthenticatedUserId } from "../lib/learner";
 
 const router: IRouter = Router();
 
@@ -189,49 +192,55 @@ const contests = [
   },
 ];
 
-const leaderboard = [
-  { rank: 1, name: "Riya Mehta", initials: "RM", target: "GATE CSE", rating: 2184, solved: 486, isCurrentUser: false },
-  { rank: 2, name: "Arjun Nair", initials: "AN", target: "UPSC + ESE", rating: 2148, solved: 452, isCurrentUser: false },
-  { rank: 3, name: "Kabir Shah", initials: "KS", target: "GATE CSE", rating: 2096, solved: 428, isCurrentUser: false },
-  { rank: 4, name: "Aarav Sharma", initials: "AS", target: "GATE CSE · You", rating: 1842, solved: 214, isCurrentUser: true },
-  { rank: 5, name: "Nandini Rao", initials: "NR", target: "SSC CGL", rating: 1821, solved: 239, isCurrentUser: false },
-  { rank: 6, name: "Dev Patel", initials: "DP", target: "ESE Mechanical", rating: 1798, solved: 196, isCurrentUser: false },
-];
-
-router.get("/dashboard", (_req, res) => {
-  res.json(
-    GetDashboardResponse.parse({
-      user: {
-        name: "Aarav Sharma",
-        initials: "AS",
-        target: "GATE CSE 2027",
-        streak: 12,
-        rank: 124,
-        percentile: 98.4,
-      },
-      stats: {
-        solved: 214,
-        accuracy: 78,
-        rating: 1842,
-        hours: 34.5,
-        solvedDelta: 18,
-        accuracyDelta: 4,
-        ratingDelta: 126,
-        hoursDelta: 6.25,
-      },
-      focus: [
-        { name: "Operating Systems", subtitle: "Your next rank unlock", progress: 72, color: "violet" },
-        { name: "General Aptitude", subtitle: "Strong momentum", progress: 84, color: "amber" },
-        { name: "Digital Logic", subtitle: "Needs a little attention", progress: 46, color: "cyan" },
-      ],
-      recentActivity: [
-        { title: "Finished Digital Logic Warm-up", meta: "12 questions · 4 hours ago", points: 84, kind: "practice" },
-        { title: "New personal best in Aptitude Blitz", meta: "Top 9% · Yesterday", points: 126, kind: "contest" },
-        { title: "Unlocked the Consistency badge", meta: "12 day streak · Yesterday", points: 50, kind: "badge" },
-        { title: "Reviewed 8 missed questions", meta: "Operating Systems · 2 days ago", points: 32, kind: "review" },
-      ],
-    }),
-  );
+router.get("/dashboard", async (req, res, next) => {
+  try {
+    const profile = await ensureLearnerProfile(req);
+    const stats = await ensureLearnerStats(profile.userId);
+    const rankings = await db
+      .select({ userId: learnerStatsTable.userId, rating: learnerStatsTable.rating })
+      .from(learnerStatsTable)
+      .orderBy(desc(learnerStatsTable.rating), asc(learnerStatsTable.updatedAt));
+    const rank = Math.max(1, rankings.findIndex((entry) => entry.userId === profile.userId) + 1);
+    const totalUsers = Math.max(1, rankings.length);
+    const focus = profile.interests.length > 0
+      ? profile.interests.slice(0, 3).map((name, index) => ({
+          name,
+          subtitle: "From your learning interests",
+          progress: Math.min(100, stats.solved * 5 + (index * 7)),
+          color: ["violet", "amber", "cyan"][index] ?? "violet",
+        }))
+      : [
+          { name: "Complete your profile", subtitle: "Unlock better recommendations", progress: 0, color: "violet" },
+          { name: "Start a practice set", subtitle: "Build your first signal", progress: 0, color: "amber" },
+          { name: "Choose a career goal", subtitle: "Shape your training room", progress: 0, color: "cyan" },
+        ];
+    res.json(
+      GetDashboardResponse.parse({
+        user: {
+          name: profile.fullName || "Learner",
+          initials: initialsFor(profile.fullName || "Learner"),
+          target: profile.careerGoal || profile.preferredJobRole || profile.branch || "Choose a target",
+          streak: stats.streak,
+          rank,
+          percentile: Math.round((1 - (rank - 1) / totalUsers) * 1000) / 10,
+        },
+        stats: {
+          solved: stats.solved,
+          accuracy: stats.totalAttempts ? Math.round((stats.correctAttempts / stats.totalAttempts) * 100) : 0,
+          rating: stats.rating,
+          hours: Math.round((stats.focusMinutes / 60) * 10) / 10,
+          solvedDelta: 0,
+          accuracyDelta: 0,
+          ratingDelta: 0,
+          hoursDelta: 0,
+        },
+        focus,
+        recentActivity: [],
+      }),
+    );
+  } catch (error) {
+    next(error);
+  }
 });
 
 router.get("/tracks", (_req, res) => {
@@ -264,7 +273,7 @@ router.get("/questions/:id", (req, res) => {
   res.json(GetQuestionResponse.parse(question));
 });
 
-router.post("/attempts", (req, res) => {
+router.post("/attempts", async (req, res, next) => {
   const parsed = SubmitAttemptBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -275,16 +284,57 @@ router.post("/attempts", (req, res) => {
     res.status(404).json({ error: "Question not found" });
     return;
   }
-  const correct = parsed.data.selectedOption === question.answer;
-  const points = correct ? Math.max(40, 100 - Math.floor(parsed.data.secondsSpent / 8)) : 0;
-  res.status(201).json(
-    SubmitAttemptResponse.parse({
-      correct,
-      points,
-      explanation: question.explanation,
-      newRating: 1842 + (correct ? 8 : -3),
-    }),
-  );
+  const userId = getAuthenticatedUserId(req);
+  if (!userId) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+  try {
+    await ensureLearnerProfile(req);
+    const correct = parsed.data.selectedOption === question.answer;
+    const points = correct ? Math.max(40, 100 - Math.floor(parsed.data.secondsSpent / 8)) : 0;
+    const newRating = await db.transaction(async (tx) => {
+      await tx.insert(learnerStatsTable).values({ userId }).onConflictDoNothing();
+      const [current] = await tx.select().from(learnerStatsTable).where(eq(learnerStatsTable.userId, userId)).limit(1);
+      if (!current) throw new Error("Learner stats not found");
+      const now = new Date();
+      const sameDay = current.lastPracticeAt
+        && current.lastPracticeAt.toISOString().slice(0, 10) === now.toISOString().slice(0, 10);
+      const nextRating = Math.max(0, current.rating + (correct ? 8 : -3));
+      await tx.insert(practiceAttemptsTable).values({
+        userId,
+        questionId: parsed.data.questionId,
+        selectedOption: parsed.data.selectedOption,
+        secondsSpent: parsed.data.secondsSpent,
+        correct,
+        points,
+      });
+      await tx
+        .update(learnerStatsTable)
+        .set({
+          rating: nextRating,
+          points: current.points + points,
+          solved: current.solved + (correct ? 1 : 0),
+          correctAttempts: current.correctAttempts + (correct ? 1 : 0),
+          totalAttempts: current.totalAttempts + 1,
+          focusMinutes: current.focusMinutes + Math.max(1, Math.ceil(parsed.data.secondsSpent / 60)),
+          streak: sameDay ? current.streak : current.streak + 1,
+          lastPracticeAt: now,
+        })
+        .where(eq(learnerStatsTable.userId, userId));
+      return nextRating;
+    });
+    res.status(201).json(
+      SubmitAttemptResponse.parse({
+        correct,
+        points,
+        explanation: question.explanation,
+        newRating,
+      }),
+    );
+  } catch (error) {
+    next(error);
+  }
 });
 
 router.get("/contests", (_req, res) => {
@@ -306,14 +356,55 @@ router.post("/contests/:id/join", (req, res) => {
   res.json(JoinContestResponse.parse(contest));
 });
 
-router.get("/leaderboard", (_req, res) => {
-  res.json(
-    GetLeaderboardResponse.parse({
-      userRank: 124,
-      totalUsers: 18420,
-      entries: leaderboard,
-    }),
-  );
+router.get("/leaderboard", async (req, res, next) => {
+  try {
+    const userId = getAuthenticatedUserId(req);
+    if (!userId) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+    const profile = await ensureLearnerProfile(req);
+    await ensureLearnerStats(userId);
+    const rows = await db
+      .select({
+        userId: learnerStatsTable.userId,
+        name: learnerProfilesTable.fullName,
+        branch: learnerProfilesTable.branch,
+        careerGoal: learnerProfilesTable.careerGoal,
+        preferredJobRole: learnerProfilesTable.preferredJobRole,
+        rating: learnerStatsTable.rating,
+        solved: learnerStatsTable.solved,
+      })
+      .from(learnerStatsTable)
+      .innerJoin(learnerProfilesTable, eq(learnerProfilesTable.userId, learnerStatsTable.userId))
+      .orderBy(desc(learnerStatsTable.rating), desc(learnerStatsTable.solved));
+    const entries = rows.map((entry, index) => ({
+      rank: index + 1,
+      name: entry.name || "Learner",
+      initials: initialsFor(entry.name || "Learner"),
+      target: entry.careerGoal || entry.preferredJobRole || entry.branch || "Learner",
+      rating: entry.rating,
+      solved: entry.solved,
+      isCurrentUser: entry.userId === profile.userId,
+    }));
+    const current = entries.find((entry) => entry.isCurrentUser);
+    res.json(GetLeaderboardResponse.parse({
+      userRank: current?.rank ?? 1,
+      totalUsers: entries.length,
+      entries,
+    }));
+  } catch (error) {
+    next(error);
+  }
 });
+
+function initialsFor(name: string) {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("") || "L";
+}
 
 export default router;

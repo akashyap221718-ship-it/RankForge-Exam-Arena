@@ -1,0 +1,24 @@
+import { useState } from 'react';
+import { CheckCircle2, Code2, Send, ShieldCheck } from 'lucide-react';
+import { getListCodingProblemsQueryKey, useListCodingProblems, useSubmitCodingSolution } from '@workspace/api-client-react';
+import { AppShell, LoadingBlocks, PageHeader, QueryState } from '@/components/AppShell';
+
+export default function CodingPage() {
+  const query = useListCodingProblems(undefined, { query: { queryKey: getListCodingProblemsQueryKey() } });
+  const submit = useSubmitCodingSolution();
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [language, setLanguage] = useState('Python');
+  const [sourceCode, setSourceCode] = useState('');
+  const selected = (query.data ?? []).find((problem) => problem.id === selectedId) ?? query.data?.[0];
+  const submitCode = () => {
+    if (!selected || !sourceCode.trim()) return;
+    submit.mutate({ data: { problemId: selected.id, language, sourceCode } });
+  };
+  return (
+    <AppShell>
+      <PageHeader eyebrow="Coding arena" title="Build proof, not just familiarity." description="Original problems across the patterns that matter in interviews. Submissions are stored now; execution stays isolated from the application server until a secure runner is connected." />
+      <QueryState error={query.isError} onRetry={() => void query.refetch()} label="The coding arena is unavailable." />
+      {query.isLoading ? <LoadingBlocks count={3} /> : <div className="grid gap-6 xl:grid-cols-[.8fr_1.2fr]"><section className="space-y-3">{(query.data ?? []).map((problem) => <button key={problem.id} type="button" onClick={() => setSelectedId(problem.id)} className={`w-full rounded-2xl border p-5 text-left transition-colors ${selected?.id === problem.id ? 'border-primary bg-primary/10' : 'border-border bg-card hover:border-primary/40'}`}><div className="flex items-center justify-between gap-3"><span className="font-mono-ui text-[10px] uppercase tracking-[.18em] text-primary">{problem.topic}</span><span className="text-xs font-bold text-muted-foreground">{problem.difficulty}</span></div><h2 className="mt-2 font-extrabold">{problem.title}</h2><p className="mt-2 line-clamp-2 text-xs leading-relaxed text-muted-foreground">{problem.statement}</p></button>)}</section>{selected && <section className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8"><div className="flex items-start justify-between gap-4"><div><div className="flex items-center gap-2 font-mono-ui text-[10px] uppercase tracking-[.18em] text-primary"><Code2 className="h-4 w-4" /> {selected.topic}</div><h2 className="mt-3 text-2xl font-extrabold">{selected.title}</h2></div><span className="rounded-full bg-muted px-3 py-1 text-xs font-bold">{selected.difficulty}</span></div><p className="mt-6 text-sm leading-relaxed text-muted-foreground">{selected.statement}</p><div className="mt-5 grid gap-4 sm:grid-cols-2"><div><p className="font-mono-ui text-[10px] uppercase tracking-wider text-muted-foreground">Example</p><pre className="mt-2 whitespace-pre-wrap rounded-xl bg-background p-4 text-xs">{selected.examples}</pre></div><div><p className="font-mono-ui text-[10px] uppercase tracking-wider text-muted-foreground">Constraints</p><p className="mt-2 rounded-xl bg-background p-4 text-xs leading-relaxed">{selected.constraints}</p></div></div><div className="mt-6 flex items-center gap-2 rounded-xl border border-accent/30 bg-accent/10 p-3 text-xs text-muted-foreground"><ShieldCheck className="h-4 w-4 shrink-0 text-accent-foreground" /> Code is never executed in the API process or with application secrets.</div><div className="mt-6 flex gap-3"><select value={language} onChange={(event) => setLanguage(event.target.value)} className="rounded-xl border border-input bg-background px-3 py-2.5 text-sm font-semibold">{selected.supportedLanguages.map((item) => <option key={item}>{item}</option>)}</select><button type="button" onClick={submitCode} disabled={submit.isPending || !sourceCode.trim()} className="ml-auto inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground disabled:opacity-50"><Send className="h-4 w-4" /> {submit.isPending ? 'Submitting' : 'Submit solution'}</button></div><textarea value={sourceCode} onChange={(event) => setSourceCode(event.target.value)} rows={14} placeholder="Write your solution here..." className="mt-4 w-full resize-y rounded-xl border border-input bg-background p-4 font-mono-ui text-xs leading-relaxed outline-none focus:border-primary" />{submit.isSuccess && <p className="mt-3 flex items-center gap-2 text-sm font-semibold text-emerald-600"><CheckCircle2 className="h-4 w-4" /> {submit.data?.message}</p>}</section>}</div>}
+    </AppShell>
+  );
+}

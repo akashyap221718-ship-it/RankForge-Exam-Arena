@@ -20,6 +20,16 @@ tags:
     description: Ranking operations
   - name: profile
     description: Authenticated learner profile operations
+  - name: jobs
+    description: Legitimate job listing operations
+  - name: engineering
+    description: Engineering study material operations
+  - name: interview
+    description: Interview preparation operations
+  - name: coding
+    description: Coding practice operations
+  - name: feedback
+    description: Feedback and complaint operations
 paths:
   /healthz:
     get:
@@ -191,6 +201,139 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Profile"
+  /jobs:
+    get:
+      operationId: listJobs
+      tags: [jobs]
+      summary: List verified job listings
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema: { type: string }
+        - name: workType
+          in: query
+          required: false
+          schema: { type: string }
+        - name: location
+          in: query
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: Verified job listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Job" }
+  /engineering/materials:
+    get:
+      operationId: listEngineeringMaterials
+      tags: [engineering]
+      summary: List engineering study materials
+      parameters:
+        - name: branch
+          in: query
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: Study materials
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/EngineeringMaterial" }
+  /interview/roles:
+    get:
+      operationId: listInterviewRoles
+      tags: [interview]
+      summary: List interview preparation roles
+      responses:
+        "200":
+          description: Interview roles
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/InterviewRole" }
+  /interview/questions:
+    get:
+      operationId: listInterviewQuestions
+      tags: [interview]
+      summary: List interview questions
+      parameters:
+        - name: role
+          in: query
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: Interview questions
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/InterviewQuestion" }
+  /coding/problems:
+    get:
+      operationId: listCodingProblems
+      tags: [coding]
+      summary: List coding practice problems
+      parameters:
+        - name: difficulty
+          in: query
+          required: false
+          schema: { type: string }
+        - name: topic
+          in: query
+          required: false
+          schema: { type: string }
+      responses:
+        "200":
+          description: Coding problems
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/CodingProblem" }
+  /coding/submissions:
+    post:
+      operationId: submitCodingSolution
+      tags: [coding]
+      summary: Store a coding solution for secure evaluation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CodingSubmissionInput"
+      responses:
+        "201":
+          description: Submission accepted for evaluation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CodingSubmissionResult"
+  /feedback:
+    post:
+      operationId: createFeedback
+      tags: [feedback]
+      summary: Submit feedback or a complaint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FeedbackInput"
+      responses:
+        "201":
+          description: Feedback submission
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Feedback"
 components:
   schemas:
     HealthStatus:
@@ -402,4 +545,103 @@ components:
           type: array
           items: { type: string, maxLength: 100 }
           maxItems: 10
+    Job:
+      type: object
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        company: { type: string }
+        location: { type: string }
+        workType: { type: string }
+        experienceRequired: { type: string }
+        requiredSkills:
+          type: array
+          items: { type: string }
+        salary: { type: ["string", "null"] }
+        description: { type: string }
+        qualifications: { type: string }
+        applicationDeadline: { type: ["string", "null"] }
+        sourceUrl: { type: string }
+        updatedAt: { type: string }
+      required: [id, title, company, location, workType, experienceRequired, requiredSkills, salary, description, qualifications, applicationDeadline, sourceUrl, updatedAt]
+    EngineeringMaterial:
+      type: object
+      properties:
+        id: { type: integer }
+        branch: { type: string }
+        subject: { type: string }
+        title: { type: string }
+        materialType: { type: string }
+        summary: { type: string }
+        topics:
+          type: array
+          items: { type: string }
+      required: [id, branch, subject, title, materialType, summary, topics]
+    InterviewRole:
+      type: object
+      properties:
+        role: { type: string }
+        questionCount: { type: integer }
+        categories:
+          type: array
+          items: { type: string }
+      required: [role, questionCount, categories]
+    InterviewQuestion:
+      type: object
+      properties:
+        id: { type: integer }
+        role: { type: string }
+        category: { type: string }
+        prompt: { type: string }
+        difficulty: { type: string }
+        answerGuide: { type: string }
+      required: [id, role, category, prompt, difficulty, answerGuide]
+    CodingProblem:
+      type: object
+      properties:
+        id: { type: integer }
+        slug: { type: string }
+        title: { type: string }
+        statement: { type: string }
+        difficulty: { type: string }
+        topic: { type: string }
+        supportedLanguages:
+          type: array
+          items: { type: string }
+        examples: { type: string }
+        constraints: { type: string }
+        expectedApproach: { type: string }
+      required: [id, slug, title, statement, difficulty, topic, supportedLanguages, examples, constraints, expectedApproach]
+    CodingSubmissionInput:
+      type: object
+      properties:
+        problemId: { type: integer }
+        language: { type: string }
+        sourceCode: { type: string, maxLength: 20000 }
+      required: [problemId, language, sourceCode]
+    CodingSubmissionResult:
+      type: object
+      properties:
+        accepted: { type: boolean }
+        status: { type: string }
+        message: { type: string }
+      required: [accepted, status, message]
+    FeedbackInput:
+      type: object
+      properties:
+        category: { type: string, maxLength: 80 }
+        subject: { type: string, maxLength: 160 }
+        description: { type: string, maxLength: 5000 }
+        attachmentUrl: { type: ["string", "null"], maxLength: 500 }
+      required: [category, subject, description]
+    Feedback:
+      type: object
+      properties:
+        id: { type: integer }
+        category: { type: string }
+        subject: { type: string }
+        description: { type: string }
+        status: { type: string }
+        createdAt: { type: string }
+      required: [id, category, subject, description, status, createdAt]
 

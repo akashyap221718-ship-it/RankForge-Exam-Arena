@@ -22,10 +22,23 @@ import type {
 import type {
   AttemptInput,
   AttemptResult,
+  CodingProblem,
+  CodingSubmissionInput,
+  CodingSubmissionResult,
   Contest,
   Dashboard,
+  EngineeringMaterial,
+  Feedback,
+  FeedbackInput,
   HealthStatus,
+  InterviewQuestion,
+  InterviewRole,
+  Job,
   Leaderboard,
+  ListCodingProblemsParams,
+  ListEngineeringMaterialsParams,
+  ListInterviewQuestionsParams,
+  ListJobsParams,
   ListQuestionSetsParams,
   Profile,
   ProfileUpdate,
@@ -933,5 +946,594 @@ export const useUpdateProfile = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getUpdateProfileMutationOptions(options));
+    }
+
+export const getListJobsUrl = (params?: ListJobsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/jobs?${stringifiedParams}` : `/api/jobs`
+}
+
+/**
+ * @summary List verified job listings
+ */
+export const listJobs = async (params?: ListJobsParams, options?: Parameters<typeof customFetch>[1]): Promise<Job[]> => {
+
+  return customFetch<Job[]>(getListJobsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListJobsQueryKey = (params?: ListJobsParams,) => {
+    return [
+    `/api/jobs`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListJobsQueryOptions = <TData = Awaited<ReturnType<typeof listJobs>>, TError = ErrorType<unknown>>(params?: ListJobsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listJobs>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListJobsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listJobs>>> = ({ signal }) => listJobs(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listJobs>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListJobsQueryResult = NonNullable<Awaited<ReturnType<typeof listJobs>>>
+export type ListJobsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List verified job listings
+ */
+
+export function useListJobs<TData = Awaited<ReturnType<typeof listJobs>>, TError = ErrorType<unknown>>(
+ params?: ListJobsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listJobs>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListJobsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListEngineeringMaterialsUrl = (params?: ListEngineeringMaterialsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/engineering/materials?${stringifiedParams}` : `/api/engineering/materials`
+}
+
+/**
+ * @summary List engineering study materials
+ */
+export const listEngineeringMaterials = async (params?: ListEngineeringMaterialsParams, options?: Parameters<typeof customFetch>[1]): Promise<EngineeringMaterial[]> => {
+
+  return customFetch<EngineeringMaterial[]>(getListEngineeringMaterialsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListEngineeringMaterialsQueryKey = (params?: ListEngineeringMaterialsParams,) => {
+    return [
+    `/api/engineering/materials`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListEngineeringMaterialsQueryOptions = <TData = Awaited<ReturnType<typeof listEngineeringMaterials>>, TError = ErrorType<unknown>>(params?: ListEngineeringMaterialsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listEngineeringMaterials>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListEngineeringMaterialsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listEngineeringMaterials>>> = ({ signal }) => listEngineeringMaterials(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listEngineeringMaterials>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListEngineeringMaterialsQueryResult = NonNullable<Awaited<ReturnType<typeof listEngineeringMaterials>>>
+export type ListEngineeringMaterialsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List engineering study materials
+ */
+
+export function useListEngineeringMaterials<TData = Awaited<ReturnType<typeof listEngineeringMaterials>>, TError = ErrorType<unknown>>(
+ params?: ListEngineeringMaterialsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listEngineeringMaterials>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListEngineeringMaterialsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListInterviewRolesUrl = () => {
+
+
+
+
+  return `/api/interview/roles`
+}
+
+/**
+ * @summary List interview preparation roles
+ */
+export const listInterviewRoles = async ( options?: Parameters<typeof customFetch>[1]): Promise<InterviewRole[]> => {
+
+  return customFetch<InterviewRole[]>(getListInterviewRolesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListInterviewRolesQueryKey = () => {
+    return [
+    `/api/interview/roles`
+    ] as const;
+    }
+
+
+export const getListInterviewRolesQueryOptions = <TData = Awaited<ReturnType<typeof listInterviewRoles>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listInterviewRoles>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListInterviewRolesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listInterviewRoles>>> = ({ signal }) => listInterviewRoles({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listInterviewRoles>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListInterviewRolesQueryResult = NonNullable<Awaited<ReturnType<typeof listInterviewRoles>>>
+export type ListInterviewRolesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List interview preparation roles
+ */
+
+export function useListInterviewRoles<TData = Awaited<ReturnType<typeof listInterviewRoles>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listInterviewRoles>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListInterviewRolesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListInterviewQuestionsUrl = (params?: ListInterviewQuestionsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/interview/questions?${stringifiedParams}` : `/api/interview/questions`
+}
+
+/**
+ * @summary List interview questions
+ */
+export const listInterviewQuestions = async (params?: ListInterviewQuestionsParams, options?: Parameters<typeof customFetch>[1]): Promise<InterviewQuestion[]> => {
+
+  return customFetch<InterviewQuestion[]>(getListInterviewQuestionsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListInterviewQuestionsQueryKey = (params?: ListInterviewQuestionsParams,) => {
+    return [
+    `/api/interview/questions`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListInterviewQuestionsQueryOptions = <TData = Awaited<ReturnType<typeof listInterviewQuestions>>, TError = ErrorType<unknown>>(params?: ListInterviewQuestionsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listInterviewQuestions>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListInterviewQuestionsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listInterviewQuestions>>> = ({ signal }) => listInterviewQuestions(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listInterviewQuestions>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListInterviewQuestionsQueryResult = NonNullable<Awaited<ReturnType<typeof listInterviewQuestions>>>
+export type ListInterviewQuestionsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List interview questions
+ */
+
+export function useListInterviewQuestions<TData = Awaited<ReturnType<typeof listInterviewQuestions>>, TError = ErrorType<unknown>>(
+ params?: ListInterviewQuestionsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listInterviewQuestions>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListInterviewQuestionsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListCodingProblemsUrl = (params?: ListCodingProblemsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/coding/problems?${stringifiedParams}` : `/api/coding/problems`
+}
+
+/**
+ * @summary List coding practice problems
+ */
+export const listCodingProblems = async (params?: ListCodingProblemsParams, options?: Parameters<typeof customFetch>[1]): Promise<CodingProblem[]> => {
+
+  return customFetch<CodingProblem[]>(getListCodingProblemsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListCodingProblemsQueryKey = (params?: ListCodingProblemsParams,) => {
+    return [
+    `/api/coding/problems`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListCodingProblemsQueryOptions = <TData = Awaited<ReturnType<typeof listCodingProblems>>, TError = ErrorType<unknown>>(params?: ListCodingProblemsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCodingProblems>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListCodingProblemsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCodingProblems>>> = ({ signal }) => listCodingProblems(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listCodingProblems>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListCodingProblemsQueryResult = NonNullable<Awaited<ReturnType<typeof listCodingProblems>>>
+export type ListCodingProblemsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List coding practice problems
+ */
+
+export function useListCodingProblems<TData = Awaited<ReturnType<typeof listCodingProblems>>, TError = ErrorType<unknown>>(
+ params?: ListCodingProblemsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCodingProblems>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListCodingProblemsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getSubmitCodingSolutionUrl = () => {
+
+
+
+
+  return `/api/coding/submissions`
+}
+
+/**
+ * @summary Store a coding solution for secure evaluation
+ */
+export const submitCodingSolution = async (codingSubmissionInput: CodingSubmissionInput, options?: Parameters<typeof customFetch>[1]): Promise<CodingSubmissionResult> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<CodingSubmissionResult>(getSubmitCodingSolutionUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(codingSubmissionInput)
+  }
+);}
+
+
+
+
+
+export const getSubmitCodingSolutionMutationKey = () => ['submitCodingSolution'] as const;
+
+export const getSubmitCodingSolutionMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitCodingSolution>>, TError,SubmitCodingSolutionMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof submitCodingSolution>>, TError,SubmitCodingSolutionMutationVariables, TContext> => {
+
+const mutationKey = getSubmitCodingSolutionMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitCodingSolution>>, SubmitCodingSolutionMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  submitCodingSolution(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitCodingSolutionMutationResult = NonNullable<Awaited<ReturnType<typeof submitCodingSolution>>>
+    export type SubmitCodingSolutionMutationBody = BodyType<CodingSubmissionInput>
+    export type SubmitCodingSolutionMutationError = ErrorType<unknown>
+    export type SubmitCodingSolutionMutationVariables = {data: BodyType<CodingSubmissionInput>}
+
+    /**
+ * @summary Store a coding solution for secure evaluation
+ */
+export const useSubmitCodingSolution = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitCodingSolution>>, TError,SubmitCodingSolutionMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof submitCodingSolution>>,
+        TError,
+        SubmitCodingSolutionMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSubmitCodingSolutionMutationOptions(options));
+    }
+
+export const getCreateFeedbackUrl = () => {
+
+
+
+
+  return `/api/feedback`
+}
+
+/**
+ * @summary Submit feedback or a complaint
+ */
+export const createFeedback = async (feedbackInput: FeedbackInput, options?: Parameters<typeof customFetch>[1]): Promise<Feedback> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<Feedback>(getCreateFeedbackUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(feedbackInput)
+  }
+);}
+
+
+
+
+
+export const getCreateFeedbackMutationKey = () => ['createFeedback'] as const;
+
+export const getCreateFeedbackMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createFeedback>>, TError,CreateFeedbackMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createFeedback>>, TError,CreateFeedbackMutationVariables, TContext> => {
+
+const mutationKey = getCreateFeedbackMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createFeedback>>, CreateFeedbackMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  createFeedback(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateFeedbackMutationResult = NonNullable<Awaited<ReturnType<typeof createFeedback>>>
+    export type CreateFeedbackMutationBody = BodyType<FeedbackInput>
+    export type CreateFeedbackMutationError = ErrorType<unknown>
+    export type CreateFeedbackMutationVariables = {data: BodyType<FeedbackInput>}
+
+    /**
+ * @summary Submit feedback or a complaint
+ */
+export const useCreateFeedback = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createFeedback>>, TError,CreateFeedbackMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createFeedback>>,
+        TError,
+        CreateFeedbackMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateFeedbackMutationOptions(options));
     }
 

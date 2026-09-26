@@ -437,6 +437,8 @@
 
 @layer base {
   html { scroll-behavior: smooth; }
+  html.light { color-scheme: light; }
+  html.dark { color-scheme: dark; }
   body { min-width: 320px; }
   button, a, input, select { -webkit-tap-highlight-color: transparent; }
   ::selection { background: hsl(var(--accent)); color: hsl(var(--accent-foreground)); }
