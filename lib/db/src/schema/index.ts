@@ -19,3 +19,4 @@
 
 export * from "./learner";
 export * from "./platform";
+export * from "./question-bank";

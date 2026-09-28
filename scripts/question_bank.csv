@@ -1,0 +1,131 @@
+﻿id,year,subject,type,question,options,answer,difficulty,tags
+Q001,1,Engineering Mathematics,MCQ,Which matrix has determinant equal to zero?,A) Singular matrix|B) Identity matrix|C) Diagonal matrix|D) Scalar matrix,A) Singular matrix,Easy,matrices
+Q002,1,Engineering Mathematics,MCQ,"If A is an identity matrix, then A² is:",A) Zero matrix|B) A|C) 2A|D) A⁻¹,B) A,Easy,matrices
+Q003,1,Engineering Mathematics,MCQ,The eigenvalues of a triangular matrix are obtained from its:,A) Row sums|B) Column sums|C) Diagonal elements|D) Trace only,C) Diagonal elements,Easy,eigenvalues
+Q004,1,Engineering Mathematics,MCQ,The derivative of sin(x) is:,A) cos(x)|B) -cos(x)|C) sin(x)|D) -sin(x),A) cos(x),Easy,calculus
+Q005,1,Engineering Mathematics,MCQ,The integral of 1/x dx is:,A) x²/2|B) ln|x| + C|C) 1/x² + C|D) eˣ + C,B) ln|x| + C,Easy,integration
+Q006,1,Engineering Mathematics,MCQ,"For Gauss-Seidel method, diagonal dominance generally helps to:",A) Increase matrix size|B) Improve convergence|C) Remove equations|D) Find determinant only,B) Improve convergence,Medium,numerical-methods
+Q007,1,Engineering Mathematics,MCQ,The rank of an identity matrix of order 3 is:,A) 1|B) 2|C) 3|D) 0,C) 3,Easy,rank
+Q008,1,Engineering Mathematics,MCQ,A differential equation containing only first derivatives is called:,A) Zero order|B) First order|C) Second order|D) Partial only,B) First order,Easy,differential-equations
+Q009,1,Engineering Mathematics,MCQ,The Laplace transform is mainly used to convert differential equations into:,A) Algebraic equations|B) Matrix equations only|C) Quadratic equations|D) Boolean equations,A) Algebraic equations,Medium,laplace
+Q010,1,Engineering Mathematics,MCQ,The trace of a square matrix is the sum of its:,A) All elements|B) Diagonal elements|C) First row|D) Eigenvectors,B) Diagonal elements,Easy,matrices
+Q011,1,Engineering Physics,MCQ,The SI unit of frequency is:,A) Hertz|B) Joule|C) Newton|D) Watt,A) Hertz,Easy,units
+Q012,1,Engineering Physics,MCQ,The phenomenon in which light bends around obstacles is:,A) Reflection|B) Refraction|C) Diffraction|D) Polarization,C) Diffraction,Easy,optics
+Q013,1,Engineering Physics,MCQ,Photon energy is given by:,A) E=mc²|B) E=hν|C) E=IR|D) E=ma,B) E=hν,Easy,quantum
+Q014,1,Engineering Physics,MCQ,The de Broglie wavelength is related to momentum p by:,A) λ=hp|B) λ=h/p|C) λ=p/h|D) λ=mc²,B) λ=h/p,Medium,quantum
+Q015,1,Engineering Physics,MCQ,LASER stands for:,A) Light Amplification by Stimulated Emission of Radiation|B) Light Absorption by Simple Emission of Radiation|C) Low Amplification System|D) Light Application System,A) Light Amplification by Stimulated Emission of Radiation,Easy,laser
+Q016,1,Engineering Physics,MCQ,Which material generally has high electrical conductivity?,A) Copper|B) Glass|C) Rubber|D) Mica,A) Copper,Easy,materials
+Q017,1,Engineering Physics,MCQ,The SI unit of magnetic flux is:,A) Tesla|B) Weber|C) Henry|D) Farad,B) Weber,Medium,magnetism
+Q018,1,Engineering Physics,MCQ,Photoelectric effect supports the:,A) Wave-only nature of light|B) Particle nature of light|C) Sound nature of light|D) Mechanical nature of light,B) Particle nature of light,Medium,photoelectric-effect
+Q019,1,Engineering Physics,MCQ,Which device converts solar energy directly into electrical energy?,A) Transformer|B) Photovoltaic cell|C) Inductor|D) Motor,B) Photovoltaic cell,Easy,solar
+Q020,1,Engineering Physics,MCQ,The unit of Planck's constant is:,A) J·s|B) J/s|C) N/m|D) C/s,A) J·s,Medium,quantum
+Q021,1,Engineering Chemistry,MCQ,The pH of a neutral solution at 25°C is approximately:,A) 0|B) 5|C) 7|D) 14,C) 7,Easy,chemistry
+Q022,1,Engineering Chemistry,MCQ,Corrosion of iron is commonly called:,A) Tarnishing|B) Rusting|C) Cracking|D) Scaling,B) Rusting,Easy,corrosion
+Q023,1,Engineering Chemistry,MCQ,The main component of natural gas is:,A) Methane|B) Ethanol|C) Benzene|D) Acetone,A) Methane,Easy,fuels
+Q024,1,Engineering Chemistry,MCQ,Which battery is commonly used in portable electronics?,A) Lead-acid only|B) Lithium-ion|C) Zinc-carbon only|D) Mercury cell,B) Lithium-ion,Easy,batteries
+Q025,1,Engineering Chemistry,MCQ,A fuel cell converts chemical energy primarily into:,A) Electrical energy|B) Sound energy|C) Mechanical vibration only|D) Nuclear energy,A) Electrical energy,Easy,fuel-cells
+Q026,1,Engineering Chemistry,MCQ,The monomer of PVC is:,A) Ethene|B) Vinyl chloride|C) Styrene|D) Tetrafluoroethylene,B) Vinyl chloride,Medium,polymers
+Q027,1,Engineering Chemistry,MCQ,Which polymer is known for high chemical resistance?,A) PTFE|B) Starch|C) Natural rubber|D) Cellulose,A) PTFE,Medium,polymers
+Q028,1,Engineering Chemistry,MCQ,Hardness of water is mainly due to salts of:,A) Na and K|B) Ca and Mg|C) Fe and Cu|D) Al and Zn,B) Ca and Mg,Easy,water-treatment
+Q029,1,Engineering Chemistry,MCQ,The process of removing temporary hardness by boiling works mainly because:,A) Chlorides evaporate|B) Bicarbonates decompose|C) Sodium freezes|D) Oxygen reacts,B) Bicarbonates decompose,Medium,water-treatment
+Q030,1,Engineering Chemistry,MCQ,A catalyst changes the:,A) Equilibrium constant|B) Activation energy pathway|C) Molecular formula|D) Atomic number,B) Activation energy pathway,Medium,catalysis
+Q031,1,Programming in C,MCQ,Which function is the usual entry point of a C program?,A) start()|B) main()|C) run()|D) init(),B) main(),Easy,c
+Q032,1,Programming in C,MCQ,Which symbol ends most C statements?,"A) :|B) ;|C) .|D) ,",B) ;,Easy,c
+Q033,1,Programming in C,MCQ,Which format specifier is commonly used for an int in C?,A) %f|B) %c|C) %d|D) %s,C) %d,Easy,c
+Q034,1,Programming in C,MCQ,Which loop executes its body at least once?,A) for|B) while|C) do-while|D) nested for,C) do-while,Easy,loops
+Q035,1,Programming in C,MCQ,Which keyword is used to return a value from a function?,A) break|B) return|C) output|D) send,B) return,Easy,functions
+Q036,1,Programming in C,MCQ,An array in C stores elements of:,A) Only different types|B) Same declared type|C) Functions only|D) Files only,B) Same declared type,Easy,arrays
+Q037,1,Programming in C,MCQ,Which operator gives the remainder of integer division?,A) /|B) %|C) //|D) &,B) %,Easy,operators
+Q038,1,Programming in C,MCQ,Recursion means a function:,A) Calls another language|B) Calls itself|C) Never returns|D) Uses no variables,B) Calls itself,Easy,recursion
+Q039,1,Programming in C,MCQ,Which is used to access a structure member through a structure variable?,A) -> only|B) .|C) ::|D) #,B) .,Medium,structures
+Q040,1,Programming in C,MCQ,Which memory allocation function allocates a block and leaves its contents uninitialized?,A) malloc()|B) calloc()|C) free()|D) realloc(),A) malloc(),Medium,pointers
+Q041,2,Python & DSA,MCQ,Which Python data type is mutable?,A) tuple|B) string|C) list|D) int,C) list,Easy,python
+Q042,2,Python & DSA,MCQ,What is the average time complexity of dictionary lookup in Python?,A) O(1)|B) O(n)|C) O(n²)|D) O(log n),A) O(1),Medium,python
+Q043,2,Python & DSA,MCQ,Which data structure follows LIFO?,A) Queue|B) Stack|C) Graph|D) Heap only,B) Stack,Easy,stack
+Q044,2,Python & DSA,MCQ,Which data structure follows FIFO?,A) Stack|B) Queue|C) Tree|D) Set,B) Queue,Easy,queue
+Q045,2,Python & DSA,MCQ,Binary search requires the array to be:,A) Random|B) Sorted|C) Empty|D) Circular,B) Sorted,Easy,searching
+Q046,2,Python & DSA,MCQ,Average time complexity of binary search is:,A) O(n²)|B) O(n)|C) O(log n)|D) O(1) always,C) O(log n),Easy,searching
+Q047,2,Python & DSA,MCQ,Which traversal of a binary search tree gives sorted order?,A) Preorder|B) Inorder|C) Postorder|D) Level order,B) Inorder,Medium,trees
+Q048,2,Python & DSA,MCQ,A graph consists primarily of:,A) Nodes and edges|B) Rows and columns only|C) Keys and values only|D) Functions and classes,A) Nodes and edges,Easy,graphs
+Q049,2,Python & DSA,MCQ,Which algorithm is commonly used for shortest paths with non-negative edge weights?,A) Dijkstra|B) DFS only|C) Bubble sort|D) KMP,A) Dijkstra,Medium,graphs
+Q050,2,Python & DSA,MCQ,Worst-case time complexity of merge sort is:,A) O(n)|B) O(log n)|C) O(n log n)|D) O(n² log n),C) O(n log n),Medium,sorting
+Q051,2,Digital Electronics,MCQ,Binary number system has base:,A) 2|B) 8|C) 10|D) 16,A) 2,Easy,number-system
+Q052,2,Digital Electronics,MCQ,XOR output is 1 when inputs are:,A) Same|B) Different|C) Both 0|D) Both 1,B) Different,Easy,logic-gates
+Q053,2,Digital Electronics,MCQ,Which gate is universal?,A) AND|B) OR|C) NAND|D) XOR,C) NAND,Easy,logic-gates
+Q054,2,Digital Electronics,MCQ,A flip-flop stores:,A) 1 bit|B) 2 bytes|C) 1 KB|D) 8 bits always,A) 1 bit,Easy,flip-flops
+Q055,2,Digital Electronics,MCQ,A multiplexer is used to:,A) Select one input from many|B) Add two binary numbers only|C) Store unlimited data|D) Convert AC to DC,A) Select one input from many,Easy,mux
+Q056,2,Digital Electronics,MCQ,K-map is mainly used for:,A) Code compilation|B) Boolean simplification|C) Memory allocation|D) Network routing,B) Boolean simplification,Easy,kmap
+Q057,2,Digital Electronics,MCQ,XNOR output is 1 when inputs are:,A) Different|B) Same|C) Always 0|D) Floating,B) Same,Easy,logic-gates
+Q058,2,Digital Electronics,MCQ,A full adder adds:,A) One bit|B) Two bits with carry-in|C) Three decimal numbers|D) Only carry bits,B) Two bits with carry-in,Medium,adders
+Q059,2,Digital Electronics,MCQ,A counter is an example of:,A) Sequential circuit|B) Pure combinational circuit|C) Analog circuit|D) Sensor,A) Sequential circuit,Easy,sequential
+Q060,2,Digital Electronics,MCQ,ADC stands for:,A) Analog-to-Digital Converter|B) Automatic Data Counter|C) Analog Data Calculator|D) Advanced Digital Circuit,A) Analog-to-Digital Converter,Easy,adc
+Q061,1,Engineering Mechanics,MCQ,Newton's second law relates force to:,A) Mass × acceleration|B) Mass × velocity|C) Work/time only|D) Pressure × volume,A) Mass × acceleration,Easy,mechanics
+Q062,1,Engineering Mechanics,MCQ,SI unit of force is:,A) Joule|B) Newton|C) Pascal|D) Watt,B) Newton,Easy,units
+Q063,1,Engineering Mechanics,MCQ,A couple produces:,A) Pure moment|B) Zero force and zero moment|C) Translation only|D) Compression only,A) Pure moment,Medium,force-system
+Q064,1,Engineering Mechanics,MCQ,The centroid of a uniform rectangle lies at:,A) One corner|B) Its geometric center|C) Midpoint of one edge|D) Outside it,B) Its geometric center,Easy,centroid
+Q065,1,Engineering Mechanics,MCQ,Friction acts generally:,A) Along the direction of impending/relative motion opposition|B) Always upward|C) Always downward|D) Perpendicular to every surface,A) Along the direction of impending/relative motion opposition,Medium,friction
+Q066,1,Engineering Mechanics,MCQ,Work done by a force is zero when force is:,A) Parallel to displacement|B) Perpendicular to displacement|C) Same direction|D) Opposite direction,B) Perpendicular to displacement,Easy,work
+Q067,1,Engineering Mechanics,MCQ,A simply supported beam typically has:,A) Two supports with one pin and one roller idealization|B) No support|C) Only fixed support|D) Four fixed supports,A) Two supports with one pin and one roller idealization,Medium,beams
+Q068,1,Engineering Mechanics,MCQ,Moment of a force about a point equals force times:,A) Mass|B) Perpendicular distance|C) Time|D) Velocity,B) Perpendicular distance,Easy,moment
+Q069,1,Engineering Mechanics,MCQ,The resultant of concurrent forces passes through their:,A) Common point of concurrency|B) Centroid always|C) Midpoint always|D) Center of mass always,A) Common point of concurrency,Medium,resultant
+Q070,1,Engineering Mechanics,MCQ,Static equilibrium requires resultant force and resultant moment to be:,A) Maximum|B) Zero|C) Positive|D) Negative,B) Zero,Easy,equilibrium
+Q071,1,Electrical Engineering,MCQ,Ohm's law is:,A) V=IR|B) P=VI²|C) I=VR|D) R=VI,A) V=IR,Easy,circuits
+Q072,1,Electrical Engineering,MCQ,Unit of resistance is:,A) Volt|B) Ohm|C) Ampere|D) Coulomb,B) Ohm,Easy,circuits
+Q073,1,Electrical Engineering,MCQ,KCL is based on conservation of:,A) Charge|B) Energy only|C) Momentum|D) Mass only,A) Charge,Medium,kcl
+Q074,1,Electrical Engineering,MCQ,KVL is based on conservation of:,A) Charge|B) Energy|C) Mass|D) Frequency,B) Energy,Medium,kvl
+Q075,1,Electrical Engineering,MCQ,A transformer works on the principle of:,A) Mutual induction|B) Electrolysis|C) Photoelectric effect|D) Rectification only,A) Mutual induction,Easy,transformer
+Q076,1,Electrical Engineering,MCQ,Power factor of a purely resistive AC circuit is:,A) 0|B) 0.5|C) 1|D) -1,C) 1,Easy,ac
+Q077,1,Electrical Engineering,MCQ,A diode ideally allows current mainly in:,A) Both directions equally|B) One direction|C) No direction|D) Random direction,B) One direction,Easy,diode
+Q078,1,Electrical Engineering,MCQ,A capacitor stores energy in its:,A) Magnetic field|B) Electric field|C) Gravitational field|D) Sound field,B) Electric field,Easy,components
+Q079,1,Electrical Engineering,MCQ,An inductor stores energy in its:,A) Electric field|B) Magnetic field|C) Chemical field|D) Thermal field,B) Magnetic field,Easy,components
+Q080,1,Electrical Engineering,MCQ,RMS value of a sinusoidal voltage is Vmax divided by:,A) 2|B) √2|C) π|D) √3,B) √2,Medium,ac
+Q081,3,Data & Computer Engineering,MCQ,SQL is primarily used for:,A) Managing/querying relational databases|B) Designing circuits|C) Compiling C only|D) Image compression only,A) Managing/querying relational databases,Easy,sql
+Q082,3,Data & Computer Engineering,MCQ,Which SQL clause filters groups after GROUP BY?,A) WHERE|B) HAVING|C) ORDER BY|D) LIMIT,B) HAVING,Medium,sql
+Q083,3,Data & Computer Engineering,MCQ,A primary key should uniquely identify:,A) Each row|B) Each database server|C) Each query|D) Each column type,A) Each row,Easy,databases
+Q084,3,Data & Computer Engineering,MCQ,Git is primarily a:,A) Version control system|B) Database engine|C) Compiler|D) Web browser,A) Version control system,Easy,git
+Q085,3,Data & Computer Engineering,MCQ,HTTP status code 404 generally means:,A) Success|B) Not Found|C) Server started|D) Unauthorized only,B) Not Found,Easy,web
+Q086,3,Data & Computer Engineering,MCQ,REST APIs commonly use HTTP methods such as:,A) GET and POST|B) RUN and STOP|C) MAKE and DELETEFILE|D) COMPILE and LINK,A) GET and POST,Easy,api
+Q087,3,Data & Computer Engineering,MCQ,Normalization in relational databases mainly helps reduce:,A) Data redundancy|B) CPU speed|C) Network bandwidth only|D) Screen resolution,A) Data redundancy,Medium,databases
+Q088,3,Data & Computer Engineering,MCQ,Which data structure is commonly used for BFS?,A) Queue|B) Stack|C) Array only|D) Heap only,A) Queue,Medium,graphs
+Q089,3,Data & Computer Engineering,MCQ,Docker primarily packages applications with their:,A) Runtime/dependencies|B) Physical monitor|C) Keyboard drivers only|D) BIOS,A) Runtime/dependencies,Medium,docker
+Q090,3,Data & Computer Engineering,MCQ,Cloud computing provides computing resources primarily over:,A) Internet/network|B) Printer cable|C) BIOS|D) Keyboard,A) Internet/network,Easy,cloud
+Q091,1,C Programming,CODING,Write a program to find the factorial of a non-negative integer using recursion. Input: n (0 ≤ n ≤ 20). Output the factorial of n.,Sample Input: 5 | Sample Output: 120,,Easy,"recursion,factorial"
+Q092,1,C Programming,CODING,Write a program to print the Fibonacci series up to n terms. Input: n. Output the first n Fibonacci terms.,Sample Input: 7 | Sample Output: 0 1 1 2 3 5 8,,Easy,"recursion,loops"
+Q093,1,C Programming,CODING,Write a program to check whether a number is prime. Input: integer n. Output Prime or Not Prime.,Sample Input: 29 | Sample Output: Prime,,Easy,"prime,numbers"
+Q094,1,C Programming,CODING,Write a program to find the largest element in an array without using a sorting function. Input: n followed by n integers. Output the maximum.,"Sample Input: 5
+4 9 2 7 1 | Sample Output: 9",,Easy,arrays
+Q095,1,C Programming,CODING,Write a program to reverse an integer without converting it to a string. Input: integer n. Output reversed integer.,Sample Input: 12340 | Sample Output: 4321,,Easy,loops
+Q096,1,C Programming,CODING,Write a program to count vowels in a given string. Input: a string. Output the number of vowels.,Sample Input: engineering | Sample Output: 5,,Easy,strings
+Q097,1,Python,CODING,Write a Python function to return the second largest distinct element in a list. Input: list of integers. Output second largest distinct value.,"Sample Input: [10, 4, 8, 10, 6] | Sample Output: 8",,Easy,lists
+Q098,1,Python,CODING,Write a program to check whether a string is a palindrome. Input: string. Output True if palindrome otherwise False.,Sample Input: level | Sample Output: True,,Easy,strings
+Q099,1,Python,CODING,Write a program to count the frequency of each element in a list. Input: list. Output frequency mapping.,"Sample Input: [1,2,2,3,1,2] | Sample Output: {1:2,2:3,3:1}",,Easy,dictionary
+Q100,1,Python,CODING,Write a program to remove duplicate values from a list while preserving first occurrence order. Input: list. Output list without duplicates.,"Sample Input: [3,1,3,2,1,4] | Sample Output: [3,1,2,4]",,Easy,lists
+Q101,2,DSA,CODING,"Implement binary search on a sorted array and return the index of the target, or -1 if absent. Input: sorted array and target.","Sample Input: [1,3,5,7,9], 7 | Sample Output: 3",,Easy,binary-search
+Q102,2,DSA,CODING,"Implement a stack using an array/list with push, pop and peek operations. Input: sequence of operations. Output results of peek/pop as required.",Sample Input: push 10; push 20; pop | Sample Output: 20,,Medium,stack
+Q103,2,DSA,CODING,Implement a queue using two stacks. Input: queue operations. Output dequeued values.,Sample Input: enqueue 10; enqueue 20; dequeue | Sample Output: 10,,Medium,queue
+Q104,2,DSA,CODING,Reverse a singly linked list iteratively. Input: linked-list values. Output reversed values.,Sample Input: 1 2 3 4 5 | Sample Output: 5 4 3 2 1,,Medium,linked-list
+Q105,2,DSA,CODING,Detect whether a singly linked list contains a cycle. Input: linked-list representation. Output True/False.,Sample Input: 1->2->3->2 | Sample Output: True,,Medium,linked-list
+Q106,2,DSA,CODING,Find the middle node of a singly linked list using O(1) extra space. Input: linked-list values. Output middle value.,Sample Input: 1 2 3 4 5 | Sample Output: 3,,Medium,linked-list
+Q107,2,DSA,CODING,Sort an array using merge sort without using a built-in sorting function. Input: array. Output sorted array.,"Sample Input: [5,2,8,1,3] | Sample Output: [1,2,3,5,8]",,Medium,sorting
+Q108,2,DSA,CODING,Find the first non-repeating character in a string. Input: lowercase string. Output character or -1.,Sample Input: swiss | Sample Output: w,,Medium,hashing
+Q109,2,DSA,CODING,"Given an array, find two numbers whose sum equals a target and return their indices. Input: array and target. Output two indices.","Sample Input: [2,7,11,15], 9 | Sample Output: [0,1]",,Medium,"arrays,hashing"
+Q110,2,DSA,CODING,Implement BFS traversal of an undirected graph starting from a given vertex. Input: graph and source. Output BFS order.,"Sample Input: 0:1,2; 1:0,3; 2:0; 3:1 | Sample Output: 0 1 2 3",,Medium,"graphs,bfs"
+Q111,3,Database,CODING,"Write an SQL query to find the second highest salary from an Employee table. Table: Employee(id, name, salary). Output second highest distinct salary.","Sample Input: salary: 100,200,300 | Sample Output: 200",,Easy,sql
+Q112,3,Database,CODING,"Write an SQL query to find departments having average salary greater than 50000. Table: Employee(id, department, salary).","Sample Input: Engineering:60000, HR:40000 | Sample Output: Engineering",,Medium,sql
+Q113,3,Database,CODING,"Write an SQL query to return employees who earn more than the average salary. Table: Employee(id, name, salary).","Sample Input: A:30000, B:50000, C:70000 | Sample Output: C",,Medium,sql
+Q114,3,Data Analysis,CODING,"Using Python/Pandas, calculate the mean salary for each department from a dataframe. Input columns: department, salary. Output department-wise mean.","Sample Input: IT:40000,50000; HR:30000 | Sample Output: HR:30000, IT:45000",,Easy,"pandas,groupby"
+Q115,3,Data Analysis,CODING,"Using Pandas, find rows containing missing values and replace numeric missing values with the column mean. Input dataframe with missing numeric values.","Sample Input: [10,None,30] | Sample Output: [10,20,30]",,Medium,"pandas,missing-data"
+Q116,3,Backend,CODING,Create a REST endpoint that returns a JSON list of all products from a database table. Input: HTTP GET /products. Output JSON array.,"Sample Input: GET /products | Sample Output: [{""id"":1,""name"":""Laptop""}]",,Medium,"api,backend"
+Q117,3,Backend,CODING,Write a function to validate whether an email-like string contains exactly one '@' and a non-empty domain. Input: string. Output True/False.,Sample Input: student@example.com | Sample Output: True,,Easy,validation
+Q118,3,Operating Systems,CODING,Simulate FCFS CPU scheduling and calculate average waiting time. Input: process IDs and burst times. Output average waiting time.,"Sample Input: P1:5,P2:3,P3:2 | Sample Output: 4.33",,Medium,"os,scheduling"
+Q119,3,Operating Systems,CODING,Implement a function to determine whether a sequence of page references has a page fault under FIFO with a given number of frames. Input: reference string and frame count.,"Sample Input: 1 2 3 1 4, frames=3 | Sample Output: 4 faults",,Medium,"os,paging"
+Q120,3,Computer Networks,CODING,"Given an IPv4 address and CIDR prefix, calculate the number of usable host addresses for a normal subnet. Input: IPv4/CIDR. Output usable host count.",Sample Input: 192.168.1.0/24 | Sample Output: 254,,Medium,"networking,subnetting"
+Q121,4,Advanced DSA,CODING,Implement Dijkstra's shortest-path algorithm for a weighted graph with non-negative weights. Input: weighted graph and source. Output shortest distances.,"Sample Input: A-B:4,A-C:1,C-B:2 | Sample Output: A:0,B:3,C:1",,Hard,"graphs,dijkstra"
+Q122,4,Advanced DSA,CODING,Implement topological sorting for a directed acyclic graph. Input: DAG. Output any valid topological ordering.,"Sample Input: A->B,A->C,B->D,C->D | Sample Output: A B C D",,Medium,"graphs,topological-sort"
+Q123,4,Advanced DSA,CODING,Find the length of the longest increasing subsequence of an integer array. Input: array. Output LIS length.,"Sample Input: [10,9,2,5,3,7,101,18] | Sample Output: 4",,Hard,dynamic-programming
+Q124,4,Advanced DSA,CODING,"Solve the 0/1 Knapsack problem using dynamic programming. Input: weights, values, capacity. Output maximum value.","Sample Input: weights=[2,3,4], values=[4,5,7], capacity=5 | Sample Output: 9",,Hard,dynamic-programming
+Q125,4,Machine Learning,CODING,"Using Python, split a dataset into training and testing sets while maintaining a fixed random seed. Input: feature matrix and target. Output train/test sizes.","Sample Input: 100 rows, test=20% | Sample Output: 80 train, 20 test",,Easy,machine-learning
+Q126,4,Machine Learning,CODING,Implement linear regression using gradient descent without using a machine-learning library. Input: x and y arrays. Output learned slope and intercept.,"Sample Input: x=[1,2,3], y=[2,4,6] | Sample Output: slope≈2, intercept≈0",,Hard,"machine-learning,gradient-descent"
+Q127,4,Data Engineering,CODING,"Write a Python ETL function that reads CSV rows, removes invalid records, transforms salary to numeric, and returns cleaned records. Input: records containing name and salary. Output cleaned records.","Sample Input: A,50000;B,invalid | Sample Output: A,50000",,Medium,"etl,data-engineering"
+Q128,4,Data Engineering,CODING,Write a function that processes a large iterable of records in batches without loading all records into memory. Input: iterable and batch size. Output batches.,"Sample Input: 1..7, batch=3 | Sample Output: [1,2,3],[4,5,6],[7]",,Medium,"python,streaming"
+Q129,4,Software Engineering,CODING,Implement a simple LRU cache supporting get and put operations in O(1) average time. Input: capacity and operations. Output get results.,"Sample Input: capacity=2; put(1,A),put(2,B),get(1),put(3,C),get(2) | Sample Output: A,-1",,Hard,"cache,system-design"

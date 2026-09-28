@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import { getAuth } from "@clerk/express";
-import { db, learnerProfilesTable, learnerStatsTable, practiceAttemptsTable } from "@workspace/db";
-import { asc, desc, eq } from "drizzle-orm";
+import { db, learnerProfilesTable, learnerStatsTable, practiceAttemptsTable, questionBankTable } from "@workspace/db";
+import { and, asc, desc, eq } from "drizzle-orm";
 import {
   GetDashboardResponse,
   GetQuestionParams,
@@ -30,134 +30,59 @@ router.use((req, res, next) => {
   next();
 });
 
-const tracks = [
-  {
-    id: 1,
-    name: "General Aptitude",
-    shortName: "APT",
-    description: "Quant, reasoning, and exam-speed fundamentals",
-    questionCount: 248,
-    color: "amber",
-  },
-  {
-    id: 2,
-    name: "Core Engineering",
-    shortName: "CORE",
-    description: "Engineering concepts across high-weightage subjects",
-    questionCount: 412,
-    color: "cyan",
-  },
-  {
-    id: 3,
-    name: "GATE Computer Science",
-    shortName: "GATE CS",
-    description: "Algorithms, OS, DBMS, and systems thinking",
-    questionCount: 356,
-    color: "violet",
-  },
-  {
-    id: 4,
-    name: "SSC CGL",
-    shortName: "SSC",
-    description: "A focused path for Tier I and Tier II preparation",
-    questionCount: 198,
-    color: "rose",
-  },
+// ---- Questions now come from the `question_bank` table (MCQ rows only) ----
+
+const TRACK_META = [
+  { id: 1, name: "General Aptitude", shortName: "APT", description: "Quant, reasoning, and exam-speed fundamentals", color: "amber" },
+  { id: 2, name: "Core Engineering", shortName: "CORE", description: "Engineering concepts across high-weightage subjects", color: "cyan" },
+  { id: 3, name: "GATE Computer Science", shortName: "GATE CS", description: "Algorithms, OS, DBMS, and systems thinking", color: "violet" },
+  { id: 4, name: "SSC CGL", shortName: "SSC", description: "A focused path for Tier I and Tier II preparation", color: "rose" },
 ];
 
-const questionSets = [
-  {
-    id: 1,
-    title: "The 20-minute Quant Sprint",
-    subtitle: "Percentages, ratios, and time-work",
-    track: "General Aptitude",
-    difficulty: "Medium",
-    questions: 15,
-    duration: 20,
-    completion: 68,
-    accent: "amber",
-  },
-  {
-    id: 2,
-    title: "Digital Logic Warm-up",
-    subtitle: "K-maps, Boolean algebra, and circuits",
-    track: "Core Engineering",
-    difficulty: "Easy",
-    questions: 12,
-    duration: 18,
-    completion: 42,
-    accent: "cyan",
-  },
-  {
-    id: 3,
-    title: "Operating Systems: The Trap Set",
-    subtitle: "Scheduling, deadlocks, and memory",
-    track: "GATE Computer Science",
-    difficulty: "Hard",
-    questions: 10,
-    duration: 25,
-    completion: 12,
-    accent: "violet",
-  },
-  {
-    id: 4,
-    title: "Reasoning: Signal vs Noise",
-    subtitle: "Series, arrangements, and deductions",
-    track: "SSC CGL",
-    difficulty: "Medium",
-    questions: 20,
-    duration: 22,
-    completion: 0,
-    accent: "rose",
-  },
-];
+// Which track each subject in the CSV belongs to. Unlisted subjects default to Core Engineering.
+const TRACK_BY_SUBJECT: Record<string, string> = {
+  "Programming in C": "GATE Computer Science",
+  "Python & DSA": "GATE Computer Science",
+  "Data & Computer Engineering": "GATE Computer Science",
+};
+const trackFor = (subject: string) => TRACK_BY_SUBJECT[subject] ?? "Core Engineering";
+const colorFor = (track: string) => TRACK_META.find((t) => t.name === track)?.color ?? "cyan";
 
-const questions = [
-  {
-    id: 1,
-    setId: 1,
-    title: "The percentage checkpoint",
-    prompt:
-      "A machine's price is increased by 20% and then discounted by 20%. What is the net percentage change in the price?",
-    options: ["No change", "4% decrease", "4% increase", "2% decrease"],
-    answer: 1,
-    explanation:
-      "Take the original price as 100. After the increase it becomes 120; a 20% discount on 120 brings it to 96. That is a 4% decrease.",
-    topic: "Percentages",
-    difficulty: "Medium",
-  },
-  {
-    id: 2,
-    setId: 2,
-    title: "Logic gate equivalence",
-    prompt:
-      "Which gate produces the same output as an AND gate followed by a NOT gate?",
-    options: ["OR", "NAND", "NOR", "XOR"],
-    answer: 1,
-    explanation:
-      "A NAND gate is, by definition, an AND operation followed by inversion.",
-    topic: "Digital Logic",
-    difficulty: "Easy",
-  },
-  {
-    id: 3,
-    setId: 3,
-    title: "Shortest-job-first intuition",
-    prompt:
-      "In a non-preemptive scheduling system, which strategy minimizes average waiting time when all burst times are known?",
-    options: [
-      "First Come First Served",
-      "Round Robin",
-      "Shortest Job First",
-      "Priority by arrival time",
-    ],
-    answer: 2,
-    explanation:
-      "Non-preemptive Shortest Job First schedules the smallest burst first and gives the minimum average waiting time when burst times are known.",
-    topic: "Operating Systems",
-    difficulty: "Hard",
-  },
-];
+type BankRow = typeof questionBankTable.$inferSelect;
+
+async function loadMcqRows(): Promise<BankRow[]> {
+  return db.select().from(questionBankTable).where(eq(questionBankTable.type, "MCQ")).orderBy(asc(questionBankTable.id));
+}
+
+const titleCase = (s: string) => s.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
+// setId = id of the first question of that subject, so "Enter set" opens the first question
+// and "Next question" (id + 1) walks through the subject.
+function toQuestion(row: BankRow, setId: number) {
+  const answer = row.answerIndex ?? 0;
+  const letter = String.fromCharCode(65 + answer);
+  return {
+    id: row.id,
+    setId,
+    title: row.subject,
+    prompt: row.question,
+    options: row.options,
+    answer,
+    explanation: `The correct answer is ${letter}) ${row.options[answer] ?? ""}.`,
+    topic: titleCase(row.tags[0] ?? row.subject),
+    difficulty: row.difficulty,
+  };
+}
+
+function groupBySubject(rows: BankRow[]) {
+  const groups = new Map<string, BankRow[]>();
+  for (const row of rows) {
+    const list = groups.get(row.subject) ?? [];
+    list.push(row);
+    groups.set(row.subject, list);
+  }
+  return groups;
+}
 
 const contests = [
   {
@@ -243,34 +168,73 @@ router.get("/dashboard", async (req, res, next) => {
   }
 });
 
-router.get("/tracks", (_req, res) => {
-  res.json(ListTracksResponse.parse(tracks));
+router.get("/tracks", async (_req, res, next) => {
+  try {
+    const rows = await loadMcqRows();
+    const counts = new Map<string, number>();
+    for (const row of rows) counts.set(trackFor(row.subject), (counts.get(trackFor(row.subject)) ?? 0) + 1);
+    const result = TRACK_META
+      .filter((t) => (counts.get(t.name) ?? 0) > 0)
+      .map((t) => ({ ...t, questionCount: counts.get(t.name) ?? 0 }));
+    res.json(ListTracksResponse.parse(result));
+  } catch (error) {
+    next(error);
+  }
 });
 
-router.get("/question-sets", (req, res) => {
+router.get("/question-sets", async (req, res, next) => {
   const parsed = ListQuestionSetsQueryParams.safeParse(req.query);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
     return;
   }
-  const filtered = parsed.data.track
-    ? questionSets.filter((set) => set.track.toLowerCase().includes(parsed.data.track!.toLowerCase()))
-    : questionSets;
-  res.json(ListQuestionSetsResponse.parse(filtered));
+  try {
+    const rows = await loadMcqRows();
+    const sets = [...groupBySubject(rows).entries()].map(([subject, list]) => {
+      const track = trackFor(subject);
+      const byDifficulty = new Map<string, number>();
+      for (const r of list) byDifficulty.set(r.difficulty, (byDifficulty.get(r.difficulty) ?? 0) + 1);
+      const difficulty = [...byDifficulty.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "Easy";
+      const topics = [...new Set(list.flatMap((r) => r.tags))].slice(0, 3).map(titleCase).join(", ");
+      return {
+        id: list[0]!.id,
+        title: subject,
+        subtitle: topics || `${list.length} questions`,
+        track,
+        difficulty,
+        questions: list.length,
+        duration: Math.ceil(list.length * 1.5),
+        completion: 0,
+        accent: colorFor(track),
+      };
+    });
+    const filtered = parsed.data.track
+      ? sets.filter((set) => set.track.toLowerCase().includes(parsed.data.track!.toLowerCase()))
+      : sets;
+    res.json(ListQuestionSetsResponse.parse(filtered));
+  } catch (error) {
+    next(error);
+  }
 });
 
-router.get("/questions/:id", (req, res) => {
+router.get("/questions/:id", async (req, res, next) => {
   const parsed = GetQuestionParams.safeParse(req.params);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
     return;
   }
-  const question = questions.find((item) => item.id === parsed.data.id);
-  if (!question) {
-    res.status(404).json({ error: "Question not found" });
-    return;
+  try {
+    const rows = await loadMcqRows();
+    const row = rows.find((item) => item.id === parsed.data.id);
+    if (!row) {
+      res.status(404).json({ error: "Question not found" });
+      return;
+    }
+    const setId = rows.find((r) => r.subject === row.subject)!.id;
+    res.json(GetQuestionResponse.parse(toQuestion(row, setId)));
+  } catch (error) {
+    next(error);
   }
-  res.json(GetQuestionResponse.parse(question));
 });
 
 router.post("/attempts", async (req, res, next) => {
@@ -279,11 +243,16 @@ router.post("/attempts", async (req, res, next) => {
     res.status(400).json({ error: parsed.error.message });
     return;
   }
-  const question = questions.find((item) => item.id === parsed.data.questionId);
-  if (!question) {
+  const [row] = await db
+    .select()
+    .from(questionBankTable)
+    .where(and(eq(questionBankTable.id, parsed.data.questionId), eq(questionBankTable.type, "MCQ")))
+    .limit(1);
+  if (!row) {
     res.status(404).json({ error: "Question not found" });
     return;
   }
+  const question = toQuestion(row, row.id);
   const userId = getAuthenticatedUserId(req);
   if (!userId) {
     res.status(401).json({ error: "Unauthorized" });
