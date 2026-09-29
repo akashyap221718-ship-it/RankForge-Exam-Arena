@@ -15,6 +15,10 @@ export default function SolvePage() {
   const [submitted, setSubmitted] = useState(false);
   const [result, setResult] = useState<{ correct: boolean; points: number; explanation: string; newRating: number } | null>(null);
 
+  // Reset the attempt state whenever we navigate to a different question,
+  // otherwise the previous question's "submitted/answer revealed" state carries over.
+  useEffect(() => { setSelected(null); setSubmitted(false); setResult(null); setSeconds(0); }, [id]);
+
   useEffect(() => { if (submitted) return; const timer = window.setInterval(() => setSeconds((value) => value + 1), 1000); return () => window.clearInterval(timer); }, [submitted]);
   const submitAnswer = () => {
     if (selected === null || !question) return;
