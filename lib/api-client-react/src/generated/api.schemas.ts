@@ -50,6 +50,18 @@ export interface Dashboard {
   recentActivity: Activity[];
 }
 
+export interface ActivityCalendarDay {
+  /** YYYY-MM-DD */
+  date: string;
+  count: number;
+}
+
+export interface ActivityCalendar {
+  days: ActivityCalendarDay[];
+  currentStreak: number;
+  longestStreak: number;
+}
+
 export interface Track {
   id: number;
   name: string;

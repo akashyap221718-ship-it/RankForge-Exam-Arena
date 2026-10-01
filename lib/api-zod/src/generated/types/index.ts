@@ -7,6 +7,8 @@
  */
 
 export * from './activity';
+export * from './activityCalendar';
+export * from './activityCalendarDay';
 export * from './attemptInput';
 export * from './attemptResult';
 export * from './codingProblem';

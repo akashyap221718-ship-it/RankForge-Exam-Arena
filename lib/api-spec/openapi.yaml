@@ -56,6 +56,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Dashboard"
+  /activity-calendar:
+    get:
+      operationId: getActivityCalendar
+      tags: [dashboard]
+      summary: Daily practice-attempt counts for the last 365 days (for a GitHub/LeetCode-style heatmap)
+      responses:
+        "200":
+          description: Activity calendar
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActivityCalendar"
   /tracks:
     get:
       operationId: listTracks
@@ -397,6 +409,22 @@ components:
         points: { type: integer }
         kind: { type: string }
       required: [title, meta, points, kind]
+    ActivityCalendarDay:
+      type: object
+      properties:
+        date: { type: string, description: "YYYY-MM-DD" }
+        count: { type: integer }
+      required: [date, count]
+    ActivityCalendar:
+      type: object
+      properties:
+        days:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActivityCalendarDay"
+        currentStreak: { type: integer }
+        longestStreak: { type: integer }
+      required: [days, currentStreak, longestStreak]
     Track:
       type: object
       properties:

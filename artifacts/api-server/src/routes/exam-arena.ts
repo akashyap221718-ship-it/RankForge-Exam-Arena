@@ -1,8 +1,9 @@
 import { Router, type IRouter } from "express";
 import { getAuth } from "@clerk/express";
 import { db, learnerProfilesTable, learnerStatsTable, practiceAttemptsTable, questionBankTable } from "@workspace/db";
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, gte, sql } from "drizzle-orm";
 import {
+  GetActivityCalendarResponse,
   GetDashboardResponse,
   GetQuestionParams,
   GetQuestionResponse,
@@ -117,6 +118,86 @@ const contests = [
   },
 ];
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+const toDateKey = (d: Date) => d.toISOString().slice(0, 10);
+
+function formatRelativeTime(date: Date): string {
+  const diffMs = Date.now() - date.getTime();
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return "Just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return "Yesterday";
+  if (days < 7) return `${days}d ago`;
+  return date.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+}
+
+async function getRecentActivity(userId: string) {
+  const rows = await db
+    .select({
+      subject: questionBankTable.subject,
+      correct: practiceAttemptsTable.correct,
+      points: practiceAttemptsTable.points,
+      createdAt: practiceAttemptsTable.createdAt,
+    })
+    .from(practiceAttemptsTable)
+    .innerJoin(questionBankTable, eq(practiceAttemptsTable.questionId, questionBankTable.id))
+    .where(eq(practiceAttemptsTable.userId, userId))
+    .orderBy(desc(practiceAttemptsTable.createdAt))
+    .limit(5);
+
+  return rows.map((row) => ({
+    title: row.subject,
+    meta: `${row.correct ? "Correct" : "Missed"} · ${formatRelativeTime(row.createdAt)}`,
+    points: row.points,
+    kind: "practice",
+  }));
+}
+
+router.get("/activity-calendar", async (req, res, next) => {
+  try {
+    const profile = await ensureLearnerProfile(req);
+    const since = new Date(Date.now() - 364 * DAY_MS);
+    since.setUTCHours(0, 0, 0, 0);
+
+    const rows = await db
+      .select({
+        date: sql<string>`to_char(${practiceAttemptsTable.createdAt}, 'YYYY-MM-DD')`,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(practiceAttemptsTable)
+      .where(and(eq(practiceAttemptsTable.userId, profile.userId), gte(practiceAttemptsTable.createdAt, since)))
+      .groupBy(sql`1`);
+
+    const countByDate = new Map(rows.map((r) => [r.date, r.count]));
+
+    // Fill every day in the 365-day window, even days with 0 attempts, so the heatmap grid is complete.
+    const days: { date: string; count: number }[] = [];
+    for (let t = since.getTime(); t <= Date.now(); t += DAY_MS) {
+      const key = toDateKey(new Date(t));
+      days.push({ date: key, count: countByDate.get(key) ?? 0 });
+    }
+
+    let currentStreak = 0;
+    for (let i = days.length - 1; i >= 0; i--) {
+      if (days[i]!.count > 0) currentStreak++;
+      else if (i !== days.length - 1) break; // allow "today" to be empty without breaking the streak
+    }
+    let longestStreak = 0;
+    let running = 0;
+    for (const day of days) {
+      running = day.count > 0 ? running + 1 : 0;
+      longestStreak = Math.max(longestStreak, running);
+    }
+
+    res.json(GetActivityCalendarResponse.parse({ days, currentStreak, longestStreak }));
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get("/dashboard", async (req, res, next) => {
   try {
     const profile = await ensureLearnerProfile(req);
@@ -160,7 +241,7 @@ router.get("/dashboard", async (req, res, next) => {
           hoursDelta: 0,
         },
         focus,
-        recentActivity: [],
+        recentActivity: await getRecentActivity(profile.userId),
       }),
     );
   } catch (error) {

@@ -1,7 +1,8 @@
 import { ArrowUpRight, BrainCircuit, Check, ChevronRight, Clock3, Crosshair, Flame, Gauge, Medal, Target, TrendingUp, Zap } from 'lucide-react';
 import { Link } from 'wouter';
-import { getGetDashboardQueryKey, useGetDashboard } from '@workspace/api-client-react';
+import { getGetActivityCalendarQueryKey, getGetDashboardQueryKey, useGetActivityCalendar, useGetDashboard } from '@workspace/api-client-react';
 import { AppShell, LoadingBlocks, MetricDelta, QueryState } from '@/components/AppShell';
+import { ActivityCalendar } from '@/components/ActivityCalendar';
 
 const fallbackFocus = [
   { name: 'Data interpretation', subtitle: 'Quantitative aptitude', progress: 72, color: '#e0a928' },
@@ -12,6 +13,7 @@ const fallbackFocus = [
 export default function DashboardPage() {
   const query = useGetDashboard({ query: { queryKey: getGetDashboardQueryKey() } });
   const dashboard = query.data;
+  const calendarQuery = useGetActivityCalendar({ query: { queryKey: getGetActivityCalendarQueryKey() } });
 
   return (
     <AppShell>
@@ -52,6 +54,14 @@ export default function DashboardPage() {
               <div className="mb-7 flex items-start justify-between"><div><p className="font-mono-ui text-[10px] uppercase tracking-[.18em] text-muted-foreground">Signal feed</p><h2 className="mt-2 text-xl font-extrabold tracking-tight">Recent activity</h2></div><div className="grid h-8 w-8 place-items-center rounded-lg bg-muted"><TrendingUp className="h-4 w-4 text-primary" /></div></div>
               <div className="space-y-1">{dashboard.recentActivity.slice(0, 5).map((activity, index) => <div key={`${activity.title}-${index}`} data-testid={`row-recent-activity-${index}`} className="group flex items-center gap-3 rounded-xl px-2 py-3 transition-colors hover:bg-muted/70"><div className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${activity.kind === 'contest' ? 'bg-accent/25 text-[#ab7600]' : 'bg-primary/10 text-primary'}`}>{activity.kind === 'contest' ? <Zap className="h-4 w-4" /> : <Check className="h-4 w-4" />}</div><div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold">{activity.title}</p><p className="mt-0.5 truncate text-xs text-muted-foreground">{activity.meta}</p></div><span className="font-mono-ui text-xs font-medium text-emerald-600">+{activity.points}</span></div>)}</div>
             </div>
+          </section>
+
+          <section className="mt-7">
+            {calendarQuery.isLoading ? (
+              <LoadingBlocks count={1} />
+            ) : calendarQuery.data ? (
+              <ActivityCalendar days={calendarQuery.data.days} currentStreak={calendarQuery.data.currentStreak} longestStreak={calendarQuery.data.longestStreak} />
+            ) : null}
           </section>
 
           <section className="stagger-in stagger-5 mt-7 overflow-hidden rounded-2xl bg-[#e9edf8] p-6 sm:p-8">

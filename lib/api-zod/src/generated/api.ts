@@ -55,6 +55,19 @@ export const GetDashboardResponse = zod.object({
 
 
 /**
+ * @summary Daily practice-attempt counts for the last 365 days (for a GitHub/LeetCode-style heatmap)
+ */
+export const GetActivityCalendarResponse = zod.object({
+  "days": zod.array(zod.object({
+  "date": zod.string().describe('YYYY-MM-DD'),
+  "count": zod.number().int()
+})),
+  "currentStreak": zod.number().int(),
+  "longestStreak": zod.number().int()
+})
+
+
+/**
  * @summary List exam tracks
  */
 export const ListTracksResponseItem = zod.object({

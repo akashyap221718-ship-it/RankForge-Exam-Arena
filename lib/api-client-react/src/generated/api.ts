@@ -20,6 +20,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  ActivityCalendar,
   AttemptInput,
   AttemptResult,
   CodingProblem,
@@ -217,6 +218,83 @@ export function useGetDashboard<TData = Awaited<ReturnType<typeof getDashboard>>
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetDashboardQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetActivityCalendarUrl = () => {
+
+
+
+
+  return `/api/activity-calendar`
+}
+
+/**
+ * @summary Daily practice-attempt counts for the last 365 days (for a GitHub/LeetCode-style heatmap)
+ */
+export const getActivityCalendar = async ( options?: Parameters<typeof customFetch>[1]): Promise<ActivityCalendar> => {
+
+  return customFetch<ActivityCalendar>(getGetActivityCalendarUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetActivityCalendarQueryKey = () => {
+    return [
+    `/api/activity-calendar`
+    ] as const;
+    }
+
+
+export const getGetActivityCalendarQueryOptions = <TData = Awaited<ReturnType<typeof getActivityCalendar>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getActivityCalendar>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetActivityCalendarQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getActivityCalendar>>> = ({ signal }) => getActivityCalendar({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getActivityCalendar>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetActivityCalendarQueryResult = NonNullable<Awaited<ReturnType<typeof getActivityCalendar>>>
+export type GetActivityCalendarQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Daily practice-attempt counts for the last 365 days (for a GitHub/LeetCode-style heatmap)
+ */
+
+export function useGetActivityCalendar<TData = Awaited<ReturnType<typeof getActivityCalendar>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getActivityCalendar>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetActivityCalendarQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
