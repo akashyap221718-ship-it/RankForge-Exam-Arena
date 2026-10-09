@@ -68,6 +68,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ActivityCalendar"
+  /progress:
+    get:
+      operationId: getProgress
+      tags: [dashboard]
+      summary: Per-user attempted and solved question counts, overall and by subject
+      responses:
+        "200":
+          description: Learner progress
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Progress"
   /tracks:
     get:
       operationId: listTracks
@@ -311,6 +323,19 @@ paths:
                 type: array
                 items: { $ref: "#/components/schemas/CodingProblem" }
   /coding/submissions:
+    get:
+      operationId: listCodingSubmissions
+      tags: [coding]
+      summary: List the signed-in learner's coding submissions, newest first
+      responses:
+        "200":
+          description: Learner coding submissions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CodingSubmissionRecord"
     post:
       operationId: submitCodingSolution
       tags: [coding]
@@ -385,6 +410,7 @@ components:
       type: object
       properties:
         solved: { type: integer }
+        attempted: { type: integer }
         accuracy: { type: number }
         rating: { type: integer }
         hours: { type: number }
@@ -392,7 +418,7 @@ components:
         accuracyDelta: { type: number }
         ratingDelta: { type: integer }
         hoursDelta: { type: number }
-      required: [solved, accuracy, rating, hours, solvedDelta, accuracyDelta, ratingDelta, hoursDelta]
+      required: [solved, attempted, accuracy, rating, hours, solvedDelta, accuracyDelta, ratingDelta, hoursDelta]
     FocusTopic:
       type: object
       properties:
@@ -409,6 +435,35 @@ components:
         points: { type: integer }
         kind: { type: string }
       required: [title, meta, points, kind]
+    SubjectProgress:
+      type: object
+      properties:
+        subject: { type: string }
+        total: { type: integer }
+        attempted: { type: integer }
+        solved: { type: integer }
+      required: [subject, total, attempted, solved]
+    Progress:
+      type: object
+      properties:
+        attempted: { type: integer }
+        solved: { type: integer }
+        subjects:
+          type: array
+          items:
+            $ref: "#/components/schemas/SubjectProgress"
+      required: [attempted, solved, subjects]
+    CodingSubmissionRecord:
+      type: object
+      properties:
+        id: { type: integer }
+        problemId: { type: integer }
+        problemTitle: { type: string }
+        language: { type: string }
+        status: { type: string }
+        sourceCode: { type: string }
+        createdAt: { type: string, description: "ISO timestamp" }
+      required: [id, problemId, problemTitle, language, status, sourceCode, createdAt]
     ActivityCalendarDay:
       type: object
       properties:

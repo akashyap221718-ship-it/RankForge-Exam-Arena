@@ -20,6 +20,7 @@ export interface UserProfile {
 
 export interface DashboardStats {
   solved: number;
+  attempted: number;
   accuracy: number;
   rating: number;
   hours: number;
@@ -48,6 +49,30 @@ export interface Dashboard {
   stats: DashboardStats;
   focus: FocusTopic[];
   recentActivity: Activity[];
+}
+
+export interface SubjectProgress {
+  subject: string;
+  total: number;
+  attempted: number;
+  solved: number;
+}
+
+export interface Progress {
+  attempted: number;
+  solved: number;
+  subjects: SubjectProgress[];
+}
+
+export interface CodingSubmissionRecord {
+  id: number;
+  problemId: number;
+  problemTitle: string;
+  language: string;
+  status: string;
+  sourceCode: string;
+  /** ISO timestamp */
+  createdAt: string;
 }
 
 export interface ActivityCalendarDay {

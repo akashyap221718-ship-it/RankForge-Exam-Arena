@@ -1,12 +1,13 @@
 import { type ReactNode, useState } from 'react';
 import { Link, useLocation } from 'wouter';
-import { BookOpenCheck, ChevronRight, Flame, LayoutDashboard, Menu, Settings2, Shield, Swords, Trophy, X } from 'lucide-react';
+import { BookOpenCheck, ChevronRight, Code2, Flame, LayoutDashboard, Menu, Settings2, Shield, Swords, Trophy, X } from 'lucide-react';
 import { getHealthCheckQueryKey, useHealthCheck } from '@workspace/api-client-react';
 import { useClerk, useUser } from '@clerk/react';
 
 const navItems = [
   { href: '/', label: 'Overview', icon: LayoutDashboard },
   { href: '/practice', label: 'Practice room', icon: BookOpenCheck },
+  { href: '/coding', label: 'Coding arena', icon: Code2 },
   { href: '/contests', label: 'Contests', icon: Swords },
   { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
 ];

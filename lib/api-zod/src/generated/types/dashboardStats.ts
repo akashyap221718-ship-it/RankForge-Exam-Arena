@@ -8,6 +8,7 @@
 
 export interface DashboardStats {
   solved: number;
+  attempted: number;
   accuracy: number;
   rating: number;
   hours: number;

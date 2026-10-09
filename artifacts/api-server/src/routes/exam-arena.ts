@@ -4,6 +4,7 @@ import { db, learnerProfilesTable, learnerStatsTable, practiceAttemptsTable, que
 import { and, asc, desc, eq, gte, sql } from "drizzle-orm";
 import {
   GetActivityCalendarResponse,
+  GetProgressResponse,
   GetDashboardResponse,
   GetQuestionParams,
   GetQuestionResponse,
@@ -18,6 +19,7 @@ import {
   SubmitAttemptResponse,
 } from "@workspace/api-zod";
 import { ensureLearnerProfile, ensureLearnerStats, getAuthenticatedUserId } from "../lib/learner";
+import { getProgress, hasSolvedBefore } from "../lib/progress";
 
 const router: IRouter = Router();
 
@@ -198,6 +200,15 @@ router.get("/activity-calendar", async (req, res, next) => {
   }
 });
 
+router.get("/progress", async (req, res, next) => {
+  try {
+    const profile = await ensureLearnerProfile(req);
+    res.json(GetProgressResponse.parse(await getProgress(profile.userId)));
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get("/dashboard", async (req, res, next) => {
   try {
     const profile = await ensureLearnerProfile(req);
@@ -206,6 +217,7 @@ router.get("/dashboard", async (req, res, next) => {
       .select({ userId: learnerStatsTable.userId, rating: learnerStatsTable.rating })
       .from(learnerStatsTable)
       .orderBy(desc(learnerStatsTable.rating), asc(learnerStatsTable.updatedAt));
+    const progress = await getProgress(profile.userId);
     const rank = Math.max(1, rankings.findIndex((entry) => entry.userId === profile.userId) + 1);
     const totalUsers = Math.max(1, rankings.length);
     const focus = profile.interests.length > 0
@@ -231,7 +243,8 @@ router.get("/dashboard", async (req, res, next) => {
           percentile: Math.round((1 - (rank - 1) / totalUsers) * 1000) / 10,
         },
         stats: {
-          solved: stats.solved,
+          solved: progress.solved,
+          attempted: progress.attempted,
           accuracy: stats.totalAttempts ? Math.round((stats.correctAttempts / stats.totalAttempts) * 100) : 0,
           rating: stats.rating,
           hours: Math.round((stats.focusMinutes / 60) * 10) / 10,
@@ -271,6 +284,9 @@ router.get("/question-sets", async (req, res, next) => {
   }
   try {
     const rows = await loadMcqRows();
+    const userId = getAuthenticatedUserId(req);
+    const progress = userId ? await getProgress(userId) : null;
+    const solvedBySubject = new Map((progress?.subjects ?? []).map((p) => [p.subject, p.solved]));
     const sets = [...groupBySubject(rows).entries()].map(([subject, list]) => {
       const track = trackFor(subject);
       const byDifficulty = new Map<string, number>();
@@ -285,7 +301,7 @@ router.get("/question-sets", async (req, res, next) => {
         difficulty,
         questions: list.length,
         duration: Math.ceil(list.length * 1.5),
-        completion: 0,
+        completion: Math.round(((solvedBySubject.get(subject) ?? 0) / list.length) * 100),
         accent: colorFor(track),
       };
     });
@@ -350,6 +366,7 @@ router.post("/attempts", async (req, res, next) => {
       const now = new Date();
       const sameDay = current.lastPracticeAt
         && current.lastPracticeAt.toISOString().slice(0, 10) === now.toISOString().slice(0, 10);
+      const firstSolve = correct && !(await hasSolvedBefore(tx, userId, parsed.data.questionId));
       const nextRating = Math.max(0, current.rating + (correct ? 8 : -3));
       await tx.insert(practiceAttemptsTable).values({
         userId,
@@ -364,7 +381,7 @@ router.post("/attempts", async (req, res, next) => {
         .set({
           rating: nextRating,
           points: current.points + points,
-          solved: current.solved + (correct ? 1 : 0),
+          solved: current.solved + (firstSolve ? 1 : 0),
           correctAttempts: current.correctAttempts + (correct ? 1 : 0),
           totalAttempts: current.totalAttempts + 1,
           focusMinutes: current.focusMinutes + Math.max(1, Math.ceil(parsed.data.secondsSpent / 60)),

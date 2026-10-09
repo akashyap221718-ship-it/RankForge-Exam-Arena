@@ -14,9 +14,10 @@ import {
   ListJobsQueryParams,
   ListJobsResponse,
   SubmitCodingSolutionBody,
+  ListCodingSubmissionsResponse,
   SubmitCodingSolutionResponse,
 } from "@workspace/api-zod";
-import { and, eq, ilike, or } from "drizzle-orm";
+import { and, desc, eq, ilike, or } from "drizzle-orm";
 import { getAuthenticatedUserId } from "../lib/learner";
 
 const router: IRouter = Router();
@@ -128,6 +129,37 @@ router.get("/coding/problems", (req, res) => {
     && (!parsed.data.topic || problem.topic.toLowerCase().includes(parsed.data.topic!.toLowerCase())),
   );
   res.json(ListCodingProblemsResponse.parse(items));
+});
+
+router.get("/coding/submissions", async (req, res, next) => {
+  try {
+    const userId = getAuthenticatedUserId(req);
+    if (!userId) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+    const rows = await db
+      .select()
+      .from(codingSubmissionsTable)
+      .where(eq(codingSubmissionsTable.userId, userId))
+      .orderBy(desc(codingSubmissionsTable.createdAt))
+      .limit(50);
+    res.json(
+      ListCodingSubmissionsResponse.parse(
+        rows.map((row) => ({
+          id: row.id,
+          problemId: row.problemId,
+          problemTitle: codingProblems.find((problem) => problem.id === row.problemId)?.title ?? `Problem #${row.problemId}`,
+          language: row.language,
+          status: row.status,
+          sourceCode: row.sourceCode,
+          createdAt: row.createdAt.toISOString(),
+        })),
+      ),
+    );
+  } catch (error) {
+    next(error);
+  }
 });
 
 router.post("/coding/submissions", async (req, res, next) => {

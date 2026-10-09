@@ -25,6 +25,7 @@ import type {
   AttemptResult,
   CodingProblem,
   CodingSubmissionInput,
+  CodingSubmissionRecord,
   CodingSubmissionResult,
   Contest,
   Dashboard,
@@ -43,6 +44,7 @@ import type {
   ListQuestionSetsParams,
   Profile,
   ProfileUpdate,
+  Progress,
   Question,
   QuestionSet,
   Track
@@ -295,6 +297,83 @@ export function useGetActivityCalendar<TData = Awaited<ReturnType<typeof getActi
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetActivityCalendarQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetProgressUrl = () => {
+
+
+
+
+  return `/api/progress`
+}
+
+/**
+ * @summary Per-user attempted and solved question counts, overall and by subject
+ */
+export const getProgress = async ( options?: Parameters<typeof customFetch>[1]): Promise<Progress> => {
+
+  return customFetch<Progress>(getGetProgressUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetProgressQueryKey = () => {
+    return [
+    `/api/progress`
+    ] as const;
+    }
+
+
+export const getGetProgressQueryOptions = <TData = Awaited<ReturnType<typeof getProgress>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getProgress>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetProgressQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getProgress>>> = ({ signal }) => getProgress({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getProgress>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetProgressQueryResult = NonNullable<Awaited<ReturnType<typeof getProgress>>>
+export type GetProgressQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Per-user attempted and solved question counts, overall and by subject
+ */
+
+export function useGetProgress<TData = Awaited<ReturnType<typeof getProgress>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getProgress>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetProgressQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
@@ -1427,6 +1506,83 @@ export function useListCodingProblems<TData = Awaited<ReturnType<typeof listCodi
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getListCodingProblemsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListCodingSubmissionsUrl = () => {
+
+
+
+
+  return `/api/coding/submissions`
+}
+
+/**
+ * @summary List the signed-in learner's coding submissions, newest first
+ */
+export const listCodingSubmissions = async ( options?: Parameters<typeof customFetch>[1]): Promise<CodingSubmissionRecord[]> => {
+
+  return customFetch<CodingSubmissionRecord[]>(getListCodingSubmissionsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListCodingSubmissionsQueryKey = () => {
+    return [
+    `/api/coding/submissions`
+    ] as const;
+    }
+
+
+export const getListCodingSubmissionsQueryOptions = <TData = Awaited<ReturnType<typeof listCodingSubmissions>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCodingSubmissions>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListCodingSubmissionsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCodingSubmissions>>> = ({ signal }) => listCodingSubmissions({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listCodingSubmissions>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListCodingSubmissionsQueryResult = NonNullable<Awaited<ReturnType<typeof listCodingSubmissions>>>
+export type ListCodingSubmissionsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List the signed-in learner's coding submissions, newest first
+ */
+
+export function useListCodingSubmissions<TData = Awaited<ReturnType<typeof listCodingSubmissions>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCodingSubmissions>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListCodingSubmissionsQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

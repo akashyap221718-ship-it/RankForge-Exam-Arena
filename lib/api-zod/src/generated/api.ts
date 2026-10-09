@@ -31,6 +31,7 @@ export const GetDashboardResponse = zod.object({
 }),
   "stats": zod.object({
   "solved": zod.number().int(),
+  "attempted": zod.number().int(),
   "accuracy": zod.number(),
   "rating": zod.number().int(),
   "hours": zod.number(),
@@ -64,6 +65,21 @@ export const GetActivityCalendarResponse = zod.object({
 })),
   "currentStreak": zod.number().int(),
   "longestStreak": zod.number().int()
+})
+
+
+/**
+ * @summary Per-user attempted and solved question counts, overall and by subject
+ */
+export const GetProgressResponse = zod.object({
+  "attempted": zod.number().int(),
+  "solved": zod.number().int(),
+  "subjects": zod.array(zod.object({
+  "subject": zod.string(),
+  "total": zod.number().int(),
+  "attempted": zod.number().int(),
+  "solved": zod.number().int()
+}))
 })
 
 
@@ -402,6 +418,21 @@ export const ListCodingProblemsResponseItem = zod.object({
   "expectedApproach": zod.string()
 })
 export const ListCodingProblemsResponse = zod.array(ListCodingProblemsResponseItem)
+
+
+/**
+ * @summary List the signed-in learner's coding submissions, newest first
+ */
+export const ListCodingSubmissionsResponseItem = zod.object({
+  "id": zod.number().int(),
+  "problemId": zod.number().int(),
+  "problemTitle": zod.string(),
+  "language": zod.string(),
+  "status": zod.string(),
+  "sourceCode": zod.string(),
+  "createdAt": zod.string().describe('ISO timestamp')
+})
+export const ListCodingSubmissionsResponse = zod.array(ListCodingSubmissionsResponseItem)
 
 
 /**
