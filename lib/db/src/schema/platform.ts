@@ -1,5 +1,5 @@
 import { createInsertSchema } from "drizzle-zod";
-import { date, integer, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, date, index, integer, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
 import { z } from "zod/v4";
 
 export const engineeringBranchesTable = pgTable("engineering_branches", {
@@ -41,8 +41,29 @@ export const codingProblemsTable = pgTable("coding_problems", {
   examples: text("examples"),
   constraints: text("constraints"),
   expectedApproach: text("expected_approach"),
+  // --- judge fields (stdin/stdout problems) ---
+  questionCode: text("question_code"), // CSV id this problem came from, e.g. "Q091"
+  inputFormat: text("input_format").notNull().default(""),
+  outputFormat: text("output_format").notNull().default(""),
+  starterCode: text("starter_code").notNull().default("{}"), // JSON: { language: code }
+  timeLimitMs: integer("time_limit_ms").notNull().default(2000),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+export const codingTestCasesTable = pgTable(
+  "coding_test_cases",
+  {
+    id: serial("id").primaryKey(),
+    problemId: integer("problem_id")
+      .notNull()
+      .references(() => codingProblemsTable.id, { onDelete: "cascade" }),
+    position: integer("position").notNull(),
+    input: text("input").notNull(),
+    expectedOutput: text("expected_output").notNull(),
+    isSample: boolean("is_sample").notNull().default(false),
+  },
+  (table) => [index("coding_test_cases_problem_idx").on(table.problemId)],
+);
 
 export const codingSubmissionsTable = pgTable("coding_submissions", {
   id: serial("id").primaryKey(),
@@ -51,6 +72,11 @@ export const codingSubmissionsTable = pgTable("coding_submissions", {
   language: text("language").notNull(),
   sourceCode: text("source_code").notNull(),
   status: text("status").notNull().default("Queued for secure evaluation"),
+  verdict: text("verdict").notNull().default("Pending"),
+  passedCount: integer("passed_count").notNull().default(0),
+  totalCount: integer("total_count").notNull().default(0),
+  runtimeMs: integer("runtime_ms").notNull().default(0),
+  errorMessage: text("error_message").notNull().default(""),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

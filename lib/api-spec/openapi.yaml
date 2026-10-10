@@ -321,12 +321,52 @@ paths:
             application/json:
               schema:
                 type: array
-                items: { $ref: "#/components/schemas/CodingProblem" }
+                items: { $ref: "#/components/schemas/CodingProblemSummary" }
+  /coding/problems/{slug}:
+    get:
+      operationId: getCodingProblem
+      tags: [coding]
+      summary: Get one coding problem with its statement, samples and starter code
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Coding problem
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CodingProblemDetail"
+  /coding/run:
+    post:
+      operationId: runCodingSolution
+      tags: [coding]
+      summary: Run code against the sample tests (or a custom input) without saving a submission
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CodingRunInput"
+      responses:
+        "200":
+          description: Run result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CodingRunResult"
   /coding/submissions:
     get:
       operationId: listCodingSubmissions
       tags: [coding]
       summary: List the signed-in learner's coding submissions, newest first
+      parameters:
+        - name: problemId
+          in: query
+          required: false
+          schema: { type: integer }
       responses:
         "200":
           description: Learner coding submissions
@@ -459,11 +499,16 @@ components:
         id: { type: integer }
         problemId: { type: integer }
         problemTitle: { type: string }
+        problemSlug: { type: string }
         language: { type: string }
-        status: { type: string }
+        verdict: { type: string }
+        passed: { type: integer }
+        total: { type: integer }
+        runtimeMs: { type: integer }
+        errorMessage: { type: string }
         sourceCode: { type: string }
         createdAt: { type: string, description: "ISO timestamp" }
-      required: [id, problemId, problemTitle, language, status, sourceCode, createdAt]
+      required: [id, problemId, problemTitle, problemSlug, language, verdict, passed, total, runtimeMs, errorMessage, sourceCode, createdAt]
     ActivityCalendarDay:
       type: object
       properties:
@@ -679,22 +724,47 @@ components:
         difficulty: { type: string }
         answerGuide: { type: string }
       required: [id, role, category, prompt, difficulty, answerGuide]
-    CodingProblem:
+    CodingProblemSummary:
       type: object
       properties:
         id: { type: integer }
         slug: { type: string }
         title: { type: string }
-        statement: { type: string }
         difficulty: { type: string }
         topic: { type: string }
-        supportedLanguages:
+        acceptance: { type: integer, description: "Percent of all submissions that were accepted, -1 when nobody has submitted yet" }
+        status: { type: string, description: "solved | attempted | todo, for the signed-in learner" }
+      required: [id, slug, title, difficulty, topic, acceptance, status]
+    CodingSample:
+      type: object
+      properties:
+        input: { type: string }
+        output: { type: string }
+      required: [input, output]
+    CodingProblemDetail:
+      type: object
+      properties:
+        id: { type: integer }
+        slug: { type: string }
+        title: { type: string }
+        difficulty: { type: string }
+        topic: { type: string }
+        statement: { type: string }
+        inputFormat: { type: string }
+        outputFormat: { type: string }
+        constraints: { type: string }
+        timeLimitMs: { type: integer }
+        languages:
           type: array
           items: { type: string }
-        examples: { type: string }
-        constraints: { type: string }
-        expectedApproach: { type: string }
-      required: [id, slug, title, statement, difficulty, topic, supportedLanguages, examples, constraints, expectedApproach]
+        starterCode:
+          type: object
+          additionalProperties: { type: string }
+        samples:
+          type: array
+          items: { $ref: "#/components/schemas/CodingSample" }
+        status: { type: string }
+      required: [id, slug, title, difficulty, topic, statement, inputFormat, outputFormat, constraints, timeLimitMs, languages, starterCode, samples, status]
     CodingSubmissionInput:
       type: object
       properties:
@@ -702,13 +772,50 @@ components:
         language: { type: string }
         sourceCode: { type: string, maxLength: 20000 }
       required: [problemId, language, sourceCode]
+    CodingCaseResult:
+      type: object
+      properties:
+        index: { type: integer }
+        isSample: { type: boolean }
+        passed: { type: boolean }
+        verdict: { type: string }
+        input: { type: string, description: "Empty for hidden test cases" }
+        expected: { type: string, description: "Empty for hidden test cases" }
+        output: { type: string }
+        error: { type: string }
+        runtimeMs: { type: integer }
+      required: [index, isSample, passed, verdict, input, expected, output, error, runtimeMs]
+    CodingRunInput:
+      type: object
+      properties:
+        problemId: { type: integer }
+        language: { type: string }
+        sourceCode: { type: string, maxLength: 20000 }
+        customInput: { type: string, maxLength: 20000 }
+      required: [problemId, language, sourceCode]
+    CodingRunResult:
+      type: object
+      properties:
+        verdict: { type: string }
+        passed: { type: integer }
+        total: { type: integer }
+        runtimeMs: { type: integer }
+        custom: { type: boolean, description: "True when the run used the custom input instead of the samples" }
+        results:
+          type: array
+          items: { $ref: "#/components/schemas/CodingCaseResult" }
+      required: [verdict, passed, total, runtimeMs, custom, results]
     CodingSubmissionResult:
       type: object
       properties:
-        accepted: { type: boolean }
-        status: { type: string }
-        message: { type: string }
-      required: [accepted, status, message]
+        id: { type: integer }
+        verdict: { type: string }
+        passed: { type: integer }
+        total: { type: integer }
+        runtimeMs: { type: integer }
+        errorMessage: { type: string }
+        failedCase: { $ref: "#/components/schemas/CodingCaseResult" }
+      required: [id, verdict, passed, total, runtimeMs, errorMessage]
     FeedbackInput:
       type: object
       properties:

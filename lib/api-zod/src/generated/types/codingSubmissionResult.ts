@@ -5,9 +5,14 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { CodingCaseResult } from './codingCaseResult';
 
 export interface CodingSubmissionResult {
-  accepted: boolean;
-  status: string;
-  message: string;
+  id: number;
+  verdict: string;
+  passed: number;
+  total: number;
+  runtimeMs: number;
+  errorMessage: string;
+  failedCase?: CodingCaseResult;
 }

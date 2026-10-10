@@ -23,7 +23,10 @@ import type {
   ActivityCalendar,
   AttemptInput,
   AttemptResult,
-  CodingProblem,
+  CodingProblemDetail,
+  CodingProblemSummary,
+  CodingRunInput,
+  CodingRunResult,
   CodingSubmissionInput,
   CodingSubmissionRecord,
   CodingSubmissionResult,
@@ -38,6 +41,7 @@ import type {
   Job,
   Leaderboard,
   ListCodingProblemsParams,
+  ListCodingSubmissionsParams,
   ListEngineeringMaterialsParams,
   ListInterviewQuestionsParams,
   ListJobsParams,
@@ -1452,9 +1456,9 @@ export const getListCodingProblemsUrl = (params?: ListCodingProblemsParams,) => 
 /**
  * @summary List coding practice problems
  */
-export const listCodingProblems = async (params?: ListCodingProblemsParams, options?: Parameters<typeof customFetch>[1]): Promise<CodingProblem[]> => {
+export const listCodingProblems = async (params?: ListCodingProblemsParams, options?: Parameters<typeof customFetch>[1]): Promise<CodingProblemSummary[]> => {
 
-  return customFetch<CodingProblem[]>(getListCodingProblemsUrl(params),
+  return customFetch<CodingProblemSummary[]>(getListCodingProblemsUrl(params),
   {
     ...options,
     method: 'GET'
@@ -1518,20 +1522,20 @@ export function useListCodingProblems<TData = Awaited<ReturnType<typeof listCodi
 
 
 
-export const getListCodingSubmissionsUrl = () => {
+export const getGetCodingProblemUrl = (slug: string,) => {
 
 
 
 
-  return `/api/coding/submissions`
+  return `/api/coding/problems/${slug}`
 }
 
 /**
- * @summary List the signed-in learner's coding submissions, newest first
+ * @summary Get one coding problem with its statement, samples and starter code
  */
-export const listCodingSubmissions = async ( options?: Parameters<typeof customFetch>[1]): Promise<CodingSubmissionRecord[]> => {
+export const getCodingProblem = async (slug: string, options?: Parameters<typeof customFetch>[1]): Promise<CodingProblemDetail> => {
 
-  return customFetch<CodingSubmissionRecord[]>(getListCodingSubmissionsUrl(),
+  return customFetch<CodingProblemDetail>(getGetCodingProblemUrl(slug),
   {
     ...options,
     method: 'GET'
@@ -1544,23 +1548,195 @@ export const listCodingSubmissions = async ( options?: Parameters<typeof customF
 
 
 
-export const getListCodingSubmissionsQueryKey = () => {
+export const getGetCodingProblemQueryKey = (slug: string,) => {
     return [
-    `/api/coding/submissions`
+    `/api/coding/problems/${slug}`
     ] as const;
     }
 
 
-export const getListCodingSubmissionsQueryOptions = <TData = Awaited<ReturnType<typeof listCodingSubmissions>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCodingSubmissions>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+export const getGetCodingProblemQueryOptions = <TData = Awaited<ReturnType<typeof getCodingProblem>>, TError = ErrorType<unknown>>(slug: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCodingProblem>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getListCodingSubmissionsQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getGetCodingProblemQueryKey(slug);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCodingSubmissions>>> = ({ signal }) => listCodingSubmissions({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCodingProblem>>> = ({ signal }) => getCodingProblem(slug, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: slug !== null && slug !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCodingProblem>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCodingProblemQueryResult = NonNullable<Awaited<ReturnType<typeof getCodingProblem>>>
+export type GetCodingProblemQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get one coding problem with its statement, samples and starter code
+ */
+
+export function useGetCodingProblem<TData = Awaited<ReturnType<typeof getCodingProblem>>, TError = ErrorType<unknown>>(
+ slug: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCodingProblem>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCodingProblemQueryOptions(slug,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getRunCodingSolutionUrl = () => {
+
+
+
+
+  return `/api/coding/run`
+}
+
+/**
+ * @summary Run code against the sample tests (or a custom input) without saving a submission
+ */
+export const runCodingSolution = async (codingRunInput: CodingRunInput, options?: Parameters<typeof customFetch>[1]): Promise<CodingRunResult> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<CodingRunResult>(getRunCodingSolutionUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(codingRunInput)
+  }
+);}
+
+
+
+
+
+export const getRunCodingSolutionMutationKey = () => ['runCodingSolution'] as const;
+
+export const getRunCodingSolutionMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runCodingSolution>>, TError,RunCodingSolutionMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof runCodingSolution>>, TError,RunCodingSolutionMutationVariables, TContext> => {
+
+const mutationKey = getRunCodingSolutionMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof runCodingSolution>>, RunCodingSolutionMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  runCodingSolution(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RunCodingSolutionMutationResult = NonNullable<Awaited<ReturnType<typeof runCodingSolution>>>
+    export type RunCodingSolutionMutationBody = BodyType<CodingRunInput>
+    export type RunCodingSolutionMutationError = ErrorType<unknown>
+    export type RunCodingSolutionMutationVariables = {data: BodyType<CodingRunInput>}
+
+    /**
+ * @summary Run code against the sample tests (or a custom input) without saving a submission
+ */
+export const useRunCodingSolution = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runCodingSolution>>, TError,RunCodingSolutionMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof runCodingSolution>>,
+        TError,
+        RunCodingSolutionMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRunCodingSolutionMutationOptions(options));
+    }
+
+export const getListCodingSubmissionsUrl = (params?: ListCodingSubmissionsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/coding/submissions?${stringifiedParams}` : `/api/coding/submissions`
+}
+
+/**
+ * @summary List the signed-in learner's coding submissions, newest first
+ */
+export const listCodingSubmissions = async (params?: ListCodingSubmissionsParams, options?: Parameters<typeof customFetch>[1]): Promise<CodingSubmissionRecord[]> => {
+
+  return customFetch<CodingSubmissionRecord[]>(getListCodingSubmissionsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListCodingSubmissionsQueryKey = (params?: ListCodingSubmissionsParams,) => {
+    return [
+    `/api/coding/submissions`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListCodingSubmissionsQueryOptions = <TData = Awaited<ReturnType<typeof listCodingSubmissions>>, TError = ErrorType<unknown>>(params?: ListCodingSubmissionsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCodingSubmissions>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListCodingSubmissionsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCodingSubmissions>>> = ({ signal }) => listCodingSubmissions(params, { signal, ...requestOptions });
 
 
 
@@ -1578,11 +1754,11 @@ export type ListCodingSubmissionsQueryError = ErrorType<unknown>
  */
 
 export function useListCodingSubmissions<TData = Awaited<ReturnType<typeof listCodingSubmissions>>, TError = ErrorType<unknown>>(
-  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCodingSubmissions>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+ params?: ListCodingSubmissionsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCodingSubmissions>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
-  const queryOptions = getListCodingSubmissionsQueryOptions(options)
+  const queryOptions = getListCodingSubmissionsQueryOptions(params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

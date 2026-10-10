@@ -6,7 +6,8 @@
   "scripts": {
     "hello": "tsx ./src/hello.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "seed-questions": "tsx ./src/seed-questions.ts"
+    "seed-questions": "tsx ./src/seed-questions.ts",
+    "seed-coding": "tsx ./src/seed-coding.ts"
   },
   "devDependencies": {
     "@types/node": "catalog:",

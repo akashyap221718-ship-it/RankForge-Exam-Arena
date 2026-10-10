@@ -409,26 +409,96 @@ export const ListCodingProblemsResponseItem = zod.object({
   "id": zod.number().int(),
   "slug": zod.string(),
   "title": zod.string(),
-  "statement": zod.string(),
   "difficulty": zod.string(),
   "topic": zod.string(),
-  "supportedLanguages": zod.array(zod.string()),
-  "examples": zod.string(),
-  "constraints": zod.string(),
-  "expectedApproach": zod.string()
+  "acceptance": zod.number().int().describe('Percent of all submissions that were accepted, -1 when nobody has submitted yet'),
+  "status": zod.string().describe('solved | attempted | todo, for the signed-in learner')
 })
 export const ListCodingProblemsResponse = zod.array(ListCodingProblemsResponseItem)
 
 
 /**
+ * @summary Get one coding problem with its statement, samples and starter code
+ */
+export const GetCodingProblemParams = zod.object({
+  "slug": zod.coerce.string()
+})
+
+export const GetCodingProblemResponse = zod.object({
+  "id": zod.number().int(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "difficulty": zod.string(),
+  "topic": zod.string(),
+  "statement": zod.string(),
+  "inputFormat": zod.string(),
+  "outputFormat": zod.string(),
+  "constraints": zod.string(),
+  "timeLimitMs": zod.number().int(),
+  "languages": zod.array(zod.string()),
+  "starterCode": zod.record(zod.string(), zod.string()),
+  "samples": zod.array(zod.object({
+  "input": zod.string(),
+  "output": zod.string()
+})),
+  "status": zod.string()
+})
+
+
+/**
+ * @summary Run code against the sample tests (or a custom input) without saving a submission
+ */
+export const runCodingSolutionBodySourceCodeMax = 20000;
+
+export const runCodingSolutionBodyCustomInputMax = 20000;
+
+
+
+export const RunCodingSolutionBody = zod.object({
+  "problemId": zod.number().int(),
+  "language": zod.string(),
+  "sourceCode": zod.string().max(runCodingSolutionBodySourceCodeMax),
+  "customInput": zod.string().max(runCodingSolutionBodyCustomInputMax).optional()
+})
+
+export const RunCodingSolutionResponse = zod.object({
+  "verdict": zod.string(),
+  "passed": zod.number().int(),
+  "total": zod.number().int(),
+  "runtimeMs": zod.number().int(),
+  "custom": zod.boolean().describe('True when the run used the custom input instead of the samples'),
+  "results": zod.array(zod.object({
+  "index": zod.number().int(),
+  "isSample": zod.boolean(),
+  "passed": zod.boolean(),
+  "verdict": zod.string(),
+  "input": zod.string().describe('Empty for hidden test cases'),
+  "expected": zod.string().describe('Empty for hidden test cases'),
+  "output": zod.string(),
+  "error": zod.string(),
+  "runtimeMs": zod.number().int()
+}))
+})
+
+
+/**
  * @summary List the signed-in learner's coding submissions, newest first
  */
+export const ListCodingSubmissionsQueryParams = zod.object({
+  "problemId": zod.coerce.number().int().optional()
+})
+
 export const ListCodingSubmissionsResponseItem = zod.object({
   "id": zod.number().int(),
   "problemId": zod.number().int(),
   "problemTitle": zod.string(),
+  "problemSlug": zod.string(),
   "language": zod.string(),
-  "status": zod.string(),
+  "verdict": zod.string(),
+  "passed": zod.number().int(),
+  "total": zod.number().int(),
+  "runtimeMs": zod.number().int(),
+  "errorMessage": zod.string(),
   "sourceCode": zod.string(),
   "createdAt": zod.string().describe('ISO timestamp')
 })
@@ -449,9 +519,23 @@ export const SubmitCodingSolutionBody = zod.object({
 })
 
 export const SubmitCodingSolutionResponse = zod.object({
-  "accepted": zod.boolean(),
-  "status": zod.string(),
-  "message": zod.string()
+  "id": zod.number().int(),
+  "verdict": zod.string(),
+  "passed": zod.number().int(),
+  "total": zod.number().int(),
+  "runtimeMs": zod.number().int(),
+  "errorMessage": zod.string(),
+  "failedCase": zod.object({
+  "index": zod.number().int(),
+  "isSample": zod.boolean(),
+  "passed": zod.boolean(),
+  "verdict": zod.string(),
+  "input": zod.string().describe('Empty for hidden test cases'),
+  "expected": zod.string().describe('Empty for hidden test cases'),
+  "output": zod.string(),
+  "error": zod.string(),
+  "runtimeMs": zod.number().int()
+}).optional()
 })
 
 

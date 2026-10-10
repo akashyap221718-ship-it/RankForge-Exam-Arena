@@ -10,8 +10,13 @@ export interface CodingSubmissionRecord {
   id: number;
   problemId: number;
   problemTitle: string;
+  problemSlug: string;
   language: string;
-  status: string;
+  verdict: string;
+  passed: number;
+  total: number;
+  runtimeMs: number;
+  errorMessage: string;
   sourceCode: string;
   /** ISO timestamp */
   createdAt: string;

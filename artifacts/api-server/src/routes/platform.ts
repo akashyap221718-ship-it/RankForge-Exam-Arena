@@ -1,11 +1,16 @@
 import { Router, type IRouter } from "express";
 import { getAuth } from "@clerk/express";
-import { db, codingSubmissionsTable, feedbackTable, jobsTable } from "@workspace/db";
+import { db, feedbackTable, jobsTable } from "@workspace/db";
 import {
   CreateFeedbackBody,
   CreateFeedbackResponse,
+  GetCodingProblemParams,
+  GetCodingProblemResponse,
   ListCodingProblemsQueryParams,
   ListCodingProblemsResponse,
+  ListCodingSubmissionsQueryParams,
+  RunCodingSolutionBody,
+  RunCodingSolutionResponse,
   ListEngineeringMaterialsQueryParams,
   ListEngineeringMaterialsResponse,
   ListInterviewQuestionsQueryParams,
@@ -17,8 +22,10 @@ import {
   ListCodingSubmissionsResponse,
   SubmitCodingSolutionResponse,
 } from "@workspace/api-zod";
-import { and, desc, eq, ilike, or } from "drizzle-orm";
+import { and, eq, ilike, or } from "drizzle-orm";
 import { getAuthenticatedUserId } from "../lib/learner";
+import { CodingError, getProblem, listProblems, listSubmissions, runCode, submitCode } from "../lib/coding";
+import { allowRun } from "../lib/judge";
 
 const router: IRouter = Router();
 
@@ -49,12 +56,6 @@ const interviewQuestions = [
   { id: 4, role: "Data Analyst", category: "Statistics", prompt: "What is the difference between correlation and causation, and how would you investigate a surprising correlation?", difficulty: "Medium", answerGuide: "Discuss confounders, selection bias, experiment design, and how segmentation can reveal Simpson's paradox." },
   { id: 5, role: "Data Engineer", category: "ETL/ELT", prompt: "What makes a data pipeline idempotent, and why does that matter when a job retries?", difficulty: "Medium", answerGuide: "Explain deterministic keys, checkpoints, upserts, and how retries avoid duplicate downstream records." },
   { id: 6, role: "Data Engineer", category: "Distributed systems", prompt: "How would you reason about late-arriving events in a daily aggregate?", difficulty: "Hard", answerGuide: "Cover event time versus processing time, watermarks, backfills, and a correction strategy for closed windows." },
-];
-
-const codingProblems = [
-  { id: 1, slug: "balanced-brackets", title: "Balanced Brackets", statement: "Given a string containing brackets, determine whether every opening bracket closes in the correct order.", difficulty: "Easy", topic: "Stack", supportedLanguages: ["C", "C++", "Python", "Java", "JavaScript"], examples: "Input: {[()]} → Output: true", constraints: "1 ≤ length ≤ 100000; characters are brackets or lowercase letters.", expectedApproach: "Scan once with a stack and match every closing bracket against the latest opening bracket." },
-  { id: 2, slug: "longest-unique-window", title: "Longest Unique Window", statement: "Return the length of the longest contiguous substring with no repeated characters.", difficulty: "Medium", topic: "Sliding Window", supportedLanguages: ["C++", "Python", "Java", "JavaScript"], examples: "Input: abca → Output: 3", constraints: "The input contains printable ASCII characters and has length at most 100000.", expectedApproach: "Use a moving left boundary and a map of the most recent index for each character." },
-  { id: 3, slug: "minimum-grid-cost", title: "Minimum Grid Cost", statement: "Move only right or down through a non-negative cost grid and return the minimum cost from the top-left to the bottom-right.", difficulty: "Hard", topic: "Dynamic Programming", supportedLanguages: ["C++", "Python", "Java"], examples: "Input: [[1,3],[2,1]] → Output: 4", constraints: "1 ≤ rows, columns ≤ 500; costs fit in a signed 32-bit integer.", expectedApproach: "Build a row-optimized dynamic-programming table and retain only the previous row's state." },
 ];
 
 router.get("/jobs", async (req, res, next) => {
@@ -118,74 +119,105 @@ router.get("/interview/questions", (req, res) => {
   res.json(ListInterviewQuestionsResponse.parse(items));
 });
 
-router.get("/coding/problems", (req, res) => {
+function requireUser(req: Parameters<typeof getAuthenticatedUserId>[0], res: import("express").Response): string | null {
+  const userId = getAuthenticatedUserId(req);
+  if (!userId) res.status(401).json({ error: "Unauthorized" });
+  return userId;
+}
+
+function handleCodingError(error: unknown, res: import("express").Response, next: import("express").NextFunction) {
+  if (error instanceof CodingError) {
+    res.status(error.status).json({ error: error.message });
+    return;
+  }
+  next(error);
+}
+
+router.get("/coding/problems", async (req, res, next) => {
   const parsed = ListCodingProblemsQueryParams.safeParse(req.query);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
     return;
   }
-  const items = codingProblems.filter((problem) =>
-    (!parsed.data.difficulty || problem.difficulty.toLowerCase() === parsed.data.difficulty!.toLowerCase())
-    && (!parsed.data.topic || problem.topic.toLowerCase().includes(parsed.data.topic!.toLowerCase())),
-  );
-  res.json(ListCodingProblemsResponse.parse(items));
+  try {
+    const userId = requireUser(req, res);
+    if (!userId) return;
+    res.json(ListCodingProblemsResponse.parse(await listProblems(userId, parsed.data)));
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/coding/problems/:slug", async (req, res, next) => {
+  const parsed = GetCodingProblemParams.safeParse(req.params);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+  try {
+    const userId = requireUser(req, res);
+    if (!userId) return;
+    const problem = await getProblem(userId, parsed.data.slug);
+    if (!problem) {
+      res.status(404).json({ error: "Problem not found" });
+      return;
+    }
+    res.json(GetCodingProblemResponse.parse(problem));
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/coding/run", async (req, res, next) => {
+  const parsed = RunCodingSolutionBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+  try {
+    const userId = requireUser(req, res);
+    if (!userId) return;
+    if (!allowRun(userId)) {
+      res.status(429).json({ error: "Too many runs. Please wait a minute and try again." });
+      return;
+    }
+    res.json(RunCodingSolutionResponse.parse(await runCode(parsed.data)));
+  } catch (error) {
+    handleCodingError(error, res, next);
+  }
 });
 
 router.get("/coding/submissions", async (req, res, next) => {
+  const parsed = ListCodingSubmissionsQueryParams.safeParse(req.query);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
   try {
-    const userId = getAuthenticatedUserId(req);
-    if (!userId) {
-      res.status(401).json({ error: "Unauthorized" });
-      return;
-    }
-    const rows = await db
-      .select()
-      .from(codingSubmissionsTable)
-      .where(eq(codingSubmissionsTable.userId, userId))
-      .orderBy(desc(codingSubmissionsTable.createdAt))
-      .limit(50);
-    res.json(
-      ListCodingSubmissionsResponse.parse(
-        rows.map((row) => ({
-          id: row.id,
-          problemId: row.problemId,
-          problemTitle: codingProblems.find((problem) => problem.id === row.problemId)?.title ?? `Problem #${row.problemId}`,
-          language: row.language,
-          status: row.status,
-          sourceCode: row.sourceCode,
-          createdAt: row.createdAt.toISOString(),
-        })),
-      ),
-    );
+    const userId = requireUser(req, res);
+    if (!userId) return;
+    res.json(ListCodingSubmissionsResponse.parse(await listSubmissions(userId, parsed.data.problemId)));
   } catch (error) {
     next(error);
   }
 });
 
 router.post("/coding/submissions", async (req, res, next) => {
+  const parsed = SubmitCodingSolutionBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
   try {
-    const userId = getAuthenticatedUserId(req);
-    if (!userId) {
-      res.status(401).json({ error: "Unauthorized" });
+    const userId = requireUser(req, res);
+    if (!userId) return;
+    if (!allowRun(userId)) {
+      res.status(429).json({ error: "Too many submissions. Please wait a minute and try again." });
       return;
     }
-    const parsed = SubmitCodingSolutionBody.safeParse(req.body);
-    if (!parsed.success) {
-      res.status(400).json({ error: parsed.error.message });
-      return;
-    }
-    if (!codingProblems.some((problem) => problem.id === parsed.data.problemId)) {
-      res.status(404).json({ error: "Coding problem not found" });
-      return;
-    }
-    await db.insert(codingSubmissionsTable).values({ userId, ...parsed.data });
-    res.status(201).json(SubmitCodingSolutionResponse.parse({
-      accepted: true,
-      status: "Queued for secure evaluation",
-      message: "Your submission was stored. Code execution is intentionally isolated from the application server.",
-    }));
+    res.status(201).json(SubmitCodingSolutionResponse.parse(await submitCode(userId, parsed.data)));
   } catch (error) {
-    next(error);
+    handleCodingError(error, res, next);
   }
 });
 

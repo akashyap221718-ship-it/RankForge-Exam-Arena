@@ -68,8 +68,13 @@ export interface CodingSubmissionRecord {
   id: number;
   problemId: number;
   problemTitle: string;
+  problemSlug: string;
   language: string;
-  status: string;
+  verdict: string;
+  passed: number;
+  total: number;
+  runtimeMs: number;
+  errorMessage: string;
   sourceCode: string;
   /** ISO timestamp */
   createdAt: string;
@@ -314,17 +319,40 @@ export interface InterviewQuestion {
   answerGuide: string;
 }
 
-export interface CodingProblem {
+export interface CodingProblemSummary {
   id: number;
   slug: string;
   title: string;
-  statement: string;
   difficulty: string;
   topic: string;
-  supportedLanguages: string[];
-  examples: string;
+  /** Percent of all submissions that were accepted, -1 when nobody has submitted yet */
+  acceptance: number;
+  /** solved | attempted | todo, for the signed-in learner */
+  status: string;
+}
+
+export interface CodingSample {
+  input: string;
+  output: string;
+}
+
+export type CodingProblemDetailStarterCode = {[key: string]: string};
+
+export interface CodingProblemDetail {
+  id: number;
+  slug: string;
+  title: string;
+  difficulty: string;
+  topic: string;
+  statement: string;
+  inputFormat: string;
+  outputFormat: string;
   constraints: string;
-  expectedApproach: string;
+  timeLimitMs: number;
+  languages: string[];
+  starterCode: CodingProblemDetailStarterCode;
+  samples: CodingSample[];
+  status: string;
 }
 
 export interface CodingSubmissionInput {
@@ -334,10 +362,47 @@ export interface CodingSubmissionInput {
   sourceCode: string;
 }
 
+export interface CodingCaseResult {
+  index: number;
+  isSample: boolean;
+  passed: boolean;
+  verdict: string;
+  /** Empty for hidden test cases */
+  input: string;
+  /** Empty for hidden test cases */
+  expected: string;
+  output: string;
+  error: string;
+  runtimeMs: number;
+}
+
+export interface CodingRunInput {
+  problemId: number;
+  language: string;
+  /** @maxLength 20000 */
+  sourceCode: string;
+  /** @maxLength 20000 */
+  customInput?: string;
+}
+
+export interface CodingRunResult {
+  verdict: string;
+  passed: number;
+  total: number;
+  runtimeMs: number;
+  /** True when the run used the custom input instead of the samples */
+  custom: boolean;
+  results: CodingCaseResult[];
+}
+
 export interface CodingSubmissionResult {
-  accepted: boolean;
-  status: string;
-  message: string;
+  id: number;
+  verdict: string;
+  passed: number;
+  total: number;
+  runtimeMs: number;
+  errorMessage: string;
+  failedCase?: CodingCaseResult;
 }
 
 export interface FeedbackInput {
@@ -384,5 +449,9 @@ role?: string;
 export type ListCodingProblemsParams = {
 difficulty?: string;
 topic?: string;
+};
+
+export type ListCodingSubmissionsParams = {
+problemId?: number;
 };
 
