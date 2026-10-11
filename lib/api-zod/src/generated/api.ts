@@ -435,6 +435,7 @@ export const GetCodingProblemResponse = zod.object({
   "outputFormat": zod.string(),
   "constraints": zod.string(),
   "timeLimitMs": zod.number().int(),
+  "kind": zod.string().describe('program (stdin/stdout) or sql (query result)'),
   "languages": zod.array(zod.string()),
   "starterCode": zod.record(zod.string(), zod.string()),
   "samples": zod.array(zod.object({

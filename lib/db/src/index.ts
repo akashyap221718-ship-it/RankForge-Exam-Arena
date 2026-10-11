@@ -17,3 +17,4 @@ export * from "./schema";
 
 // Re-exported so scripts can build queries without their own drizzle-orm dependency.
 export { eq } from "drizzle-orm";
+export { formatSqlRows, formatSqlValue, validateUserSql } from "./sql-format";

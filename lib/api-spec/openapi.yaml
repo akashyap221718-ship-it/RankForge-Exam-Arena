@@ -754,6 +754,7 @@ components:
         outputFormat: { type: string }
         constraints: { type: string }
         timeLimitMs: { type: integer }
+        kind: { type: string, description: "program (stdin/stdout) or sql (query result)" }
         languages:
           type: array
           items: { type: string }
@@ -764,7 +765,7 @@ components:
           type: array
           items: { $ref: "#/components/schemas/CodingSample" }
         status: { type: string }
-      required: [id, slug, title, difficulty, topic, statement, inputFormat, outputFormat, constraints, timeLimitMs, languages, starterCode, samples, status]
+      required: [id, slug, title, difficulty, topic, statement, inputFormat, outputFormat, constraints, timeLimitMs, kind, languages, starterCode, samples, status]
     CodingSubmissionInput:
       type: object
       properties:

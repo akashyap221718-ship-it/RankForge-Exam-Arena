@@ -47,6 +47,8 @@ export const codingProblemsTable = pgTable("coding_problems", {
   outputFormat: text("output_format").notNull().default(""),
   starterCode: text("starter_code").notNull().default("{}"), // JSON: { language: code }
   timeLimitMs: integer("time_limit_ms").notNull().default(2000),
+  kind: text("kind").notNull().default("program"), // "program" (stdin/stdout) or "sql" (result set)
+  orderedResult: boolean("ordered_result").notNull().default(false), // sql only: row order must match
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

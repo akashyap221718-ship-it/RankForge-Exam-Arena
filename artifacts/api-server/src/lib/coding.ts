@@ -1,6 +1,6 @@
 import { codingProblemsTable, codingSubmissionsTable, codingTestCasesTable, db } from "@workspace/db";
 import { and, asc, desc, eq, ilike, sql } from "drizzle-orm";
-import { isSupportedLanguage, judge, runOnce, type CaseResult, type TestCase } from "./judge";
+import { isSupportedLanguage, judge, JudgeUnavailableError, runOnce, type CaseResult, type Language, type TestCase } from "./judge";
 
 export type ProblemStatus = "solved" | "attempted" | "todo";
 
@@ -91,6 +91,7 @@ export async function getProblem(userId: string, slug: string) {
     outputFormat: problem.outputFormat,
     constraints: problem.constraints,
     timeLimitMs: problem.timeLimitMs,
+    kind: problem.kind,
     languages: problem.supportedLanguages,
     starterCode,
     samples,
@@ -99,9 +100,12 @@ export async function getProblem(userId: string, slug: string) {
 }
 
 async function loadProblemAndTests(problemId: number, language: string) {
-  if (!isSupportedLanguage(language)) throw new CodingError(400, `Language "${language}" is not supported yet. Use JavaScript.`);
+  if (!isSupportedLanguage(language)) throw new CodingError(400, `Language "${language}" is not supported.`);
   const [problem] = await db.select().from(codingProblemsTable).where(eq(codingProblemsTable.id, problemId)).limit(1);
   if (!problem) throw new CodingError(404, "Problem not found");
+  if (!problem.supportedLanguages.includes(language)) {
+    throw new CodingError(400, `This problem cannot be solved in "${language}". Available: ${problem.supportedLanguages.join(", ")}.`);
+  }
   const tests = await db
     .select()
     .from(codingTestCasesTable)
@@ -109,15 +113,26 @@ async function loadProblemAndTests(problemId: number, language: string) {
     .orderBy(asc(codingTestCasesTable.position));
   if (tests.length === 0) throw new CodingError(409, "This problem has no test cases yet");
   const cases: TestCase[] = tests.map((t) => ({ input: t.input, expectedOutput: t.expectedOutput, isSample: t.isSample }));
-  return { problem, cases };
+  return { problem, cases, language: language as Language };
+}
+
+/** Turns "runner is down / rate limited" into a clean 503 for the API. */
+async function guardRunner<T>(work: () => Promise<T>): Promise<T> {
+  try {
+    return await work();
+  } catch (error) {
+    if (error instanceof JudgeUnavailableError) throw new CodingError(503, error.message);
+    throw error;
+  }
 }
 
 /** "Run": sample tests only (or one custom input). Nothing is saved. */
 export async function runCode(input: { problemId: number; language: string; sourceCode: string; customInput?: string }) {
-  const { problem, cases } = await loadProblemAndTests(input.problemId, input.language);
+  const { problem, cases, language } = await loadProblemAndTests(input.problemId, input.language);
 
   if (input.customInput !== undefined && input.customInput.trim() !== "") {
-    const one: CaseResult = await runOnce(input.sourceCode, input.customInput, problem.timeLimitMs);
+    if (problem.kind === "sql") throw new CodingError(400, "Custom input is not available for SQL problems.");
+    const one: CaseResult = await guardRunner(() => runOnce(language, input.sourceCode, input.customInput!, problem.timeLimitMs));
     return {
       verdict: one.passed ? "Finished" : one.verdict,
       passed: one.passed ? 1 : 0,
@@ -129,14 +144,14 @@ export async function runCode(input: { problemId: number; language: string; sour
   }
 
   const samples = cases.filter((c) => c.isSample);
-  const result = await judge(input.sourceCode, samples, problem.timeLimitMs, { stopOnFail: false });
+  const result = await guardRunner(() => judge(language, input.sourceCode, samples, problem.timeLimitMs, { stopOnFail: false, sqlOrdered: problem.orderedResult }));
   return { verdict: result.verdict, passed: result.passed, total: result.total, runtimeMs: result.runtimeMs, custom: false, results: result.results };
 }
 
 /** "Submit": every test (samples first, then hidden). Stops at the first failure and is saved. */
 export async function submitCode(userId: string, input: { problemId: number; language: string; sourceCode: string }) {
-  const { problem, cases } = await loadProblemAndTests(input.problemId, input.language);
-  const result = await judge(input.sourceCode, cases, problem.timeLimitMs, { stopOnFail: true });
+  const { problem, cases, language } = await loadProblemAndTests(input.problemId, input.language);
+  const result = await guardRunner(() => judge(language, input.sourceCode, cases, problem.timeLimitMs, { stopOnFail: true, sqlOrdered: problem.orderedResult }));
 
   const [row] = await db
     .insert(codingSubmissionsTable)

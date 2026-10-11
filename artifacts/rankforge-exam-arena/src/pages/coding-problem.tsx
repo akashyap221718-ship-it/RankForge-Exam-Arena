@@ -17,7 +17,12 @@ import { AppShell, LoadingBlocks, QueryState } from '@/components/AppShell';
 import { CodingSubmissions } from '@/components/CodingSubmissions';
 import { DifficultyBadge, VerdictBadge, errorText } from '@/components/CodingBadges';
 
-const LANGUAGE_LABELS: Record<string, string> = { javascript: 'JavaScript' };
+const LANGUAGE_LABELS: Record<string, string> = {
+  javascript: 'JavaScript', python: 'Python 3', java: 'Java', cpp: 'C++', c: 'C', csharp: 'C#', go: 'Go',
+  rust: 'Rust', kotlin: 'Kotlin', typescript: 'TypeScript', php: 'PHP', ruby: 'Ruby', sql: 'SQL (SQLite)',
+};
+/** JavaScript and SQL run on our own server; every other language runs on the Judge0 code runner. */
+const isRemoteLanguage = (language: string) => language !== 'javascript' && language !== 'sql';
 
 function loadDraft(key: string): string | null {
   try {
@@ -44,7 +49,7 @@ function Block({ label, text, tone = 'default' }: { label: string; text: string;
   );
 }
 
-function CaseView({ c, showExpected }: { c: CodingCaseResult; showExpected: boolean }) {
+function CaseView({ c, showExpected, sql = false }: { c: CodingCaseResult; showExpected: boolean; sql?: boolean }) {
   return (
     <div className="space-y-2.5 rounded-xl border border-border bg-background p-3.5" data-testid={`case-result-${c.index}`}>
       <div className="flex items-center gap-2.5">
@@ -52,15 +57,15 @@ function CaseView({ c, showExpected }: { c: CodingCaseResult; showExpected: bool
         <VerdictBadge verdict={c.passed ? 'Accepted' : c.verdict} />
         <span className="ml-auto font-mono-ui text-[10px] text-muted-foreground">{c.runtimeMs} ms</span>
       </div>
-      {c.input !== '' ? <Block label="Input" text={c.input.trimEnd()} /> : null}
-      {showExpected && c.expected !== '' ? <Block label="Expected output" text={c.expected.trimEnd()} /> : null}
-      {c.output !== '' || !c.error ? <Block label="Your output" text={c.output.trimEnd()} /> : null}
+      {c.input !== '' ? <Block label={sql ? 'Tables' : 'Input'} text={c.input.trimEnd()} /> : null}
+      {showExpected && c.expected !== '' ? <Block label={sql ? 'Expected result' : 'Expected output'} text={c.expected.trimEnd()} /> : null}
+      {c.output !== '' || !c.error ? <Block label={sql ? 'Your result' : 'Your output'} text={c.output.trimEnd()} /> : null}
       {c.error ? <Block label="Error" text={c.error} tone="error" /> : null}
     </div>
   );
 }
 
-export function RunPanel({ result }: { result: CodingRunResult }) {
+export function RunPanel({ result, sql = false }: { result: CodingRunResult; sql?: boolean }) {
   return (
     <div className="space-y-3" data-testid="panel-run-result">
       <div className="flex flex-wrap items-center gap-3">
@@ -68,12 +73,12 @@ export function RunPanel({ result }: { result: CodingRunResult }) {
         <span className="text-sm font-semibold">{result.custom ? 'Custom input' : `${result.passed} / ${result.total} sample tests passed`}</span>
         <span className="flex items-center gap-1 font-mono-ui text-[11px] text-muted-foreground"><Clock3 className="h-3 w-3" />{result.runtimeMs} ms</span>
       </div>
-      {result.results.map((c) => <CaseView key={c.index} c={c} showExpected={!result.custom} />)}
+      {result.results.map((c) => <CaseView key={c.index} c={c} showExpected={!result.custom} sql={sql} />)}
     </div>
   );
 }
 
-export function SubmitPanel({ result }: { result: CodingSubmissionResult }) {
+export function SubmitPanel({ result, sql = false }: { result: CodingSubmissionResult; sql?: boolean }) {
   const accepted = result.verdict === 'Accepted';
   const failed = result.failedCase;
   return (
@@ -81,18 +86,18 @@ export function SubmitPanel({ result }: { result: CodingSubmissionResult }) {
       <div className={`rounded-xl p-4 ${accepted ? 'bg-emerald-500/10' : 'bg-red-500/8'}`}>
         <p className={`text-lg font-extrabold ${accepted ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-700 dark:text-red-400'}`} data-testid="text-submit-verdict">{result.verdict}</p>
         <p className="mt-1 font-mono-ui text-xs text-muted-foreground">
-          {result.passed} / {result.total} test cases passed · {result.runtimeMs} ms
+          {result.passed} / {result.total} {sql ? 'datasets' : 'test cases'} passed · {result.runtimeMs} ms
         </p>
         {accepted ? <p className="mt-2 text-sm">Nice work. Every sample and hidden test passed.</p> : null}
       </div>
       {failed ? (
         failed.isSample ? (
-          <CaseView c={failed} showExpected />
+          <CaseView c={failed} showExpected sql={sql} />
         ) : (
           <div className="space-y-2.5 rounded-xl border border-border bg-background p-3.5">
             <p className="text-sm font-semibold">Failed on hidden test #{failed.index}</p>
-            <p className="text-xs text-muted-foreground">Hidden test inputs are not shown. Try edge cases: the smallest and largest inputs, repeated values, negative numbers.</p>
-            {failed.output !== '' ? <Block label="Your output" text={failed.output.trimEnd()} /> : null}
+            <p className="text-xs text-muted-foreground">{sql ? 'Hidden datasets are not shown. Think about NULLs, ties, duplicates and empty results.' : 'Hidden test inputs are not shown. Try edge cases: the smallest and largest inputs, repeated values, negative numbers.'}</p>
+            {failed.output !== '' ? <Block label={sql ? 'Your result' : 'Your output'} text={failed.output.trimEnd()} /> : null}
             {failed.error ? <Block label="Error" text={failed.error} tone="error" /> : null}
           </div>
         )
@@ -103,6 +108,7 @@ export function SubmitPanel({ result }: { result: CodingSubmissionResult }) {
 
 export function Workspace({ problem }: { problem: CodingProblemDetail }) {
   const queryClient = useQueryClient();
+  const isSql = problem.kind === 'sql';
   const [language, setLanguage] = useState(problem.languages[0] ?? 'javascript');
   const draftKey = (lang: string) => `rankforge-code:${problem.slug}:${lang}`;
   const [code, setCode] = useState(() => loadDraft(draftKey(problem.languages[0] ?? 'javascript')) ?? problem.starterCode[problem.languages[0] ?? 'javascript'] ?? '');
@@ -136,7 +142,7 @@ export function Workspace({ problem }: { problem: CodingProblemDetail }) {
     setError(null);
     setPanel('run');
     runMutation.mutate(
-      { data: { problemId: problem.id, language, sourceCode: code, ...(useCustom ? { customInput } : {}) } },
+      { data: { problemId: problem.id, language, sourceCode: code, ...(useCustom && !isSql ? { customInput } : {}) } },
       { onSuccess: (data) => setRunResult(data), onError: (e) => setError(errorText(e)) },
     );
   };
@@ -187,20 +193,20 @@ export function Workspace({ problem }: { problem: CodingProblemDetail }) {
             <div className="space-y-6">
               <p className="whitespace-pre-wrap text-[15px] leading-relaxed" data-testid="text-statement">{problem.statement}</p>
               <div className="grid gap-4 sm:grid-cols-2">
-                <Block label="Input format" text={problem.inputFormat} />
-                <Block label="Output format" text={problem.outputFormat} />
+                <Block label={isSql ? 'How it runs' : 'Input format'} text={problem.inputFormat} />
+                <Block label={isSql ? 'Result format' : 'Output format'} text={problem.outputFormat} />
               </div>
               <Block label="Constraints" text={problem.constraints} />
               <div className="space-y-3">
                 {problem.samples.map((sample, i) => (
                   <div key={i} className="space-y-2 rounded-xl border border-border bg-background p-3.5">
                     <p className="text-xs font-bold">Example {i + 1}</p>
-                    <Block label="Input" text={sample.input.trimEnd()} />
-                    <Block label="Output" text={sample.output.trimEnd()} />
+                    <Block label={isSql ? 'Tables' : 'Input'} text={sample.input.trimEnd()} />
+                    <Block label={isSql ? 'Expected result' : 'Output'} text={sample.output.trimEnd()} />
                   </div>
                 ))}
               </div>
-              <p className="flex items-center gap-1.5 font-mono-ui text-[11px] text-muted-foreground"><Clock3 className="h-3 w-3" /> Time limit: {problem.timeLimitMs} ms per test</p>
+              <p className="flex items-center gap-1.5 font-mono-ui text-[11px] text-muted-foreground"><Clock3 className="h-3 w-3" /> Time limit: {problem.timeLimitMs} ms per {isSql ? 'dataset' : 'test'}</p>
             </div>
           ) : (
             <CodingSubmissions problemId={problem.id} bare />
@@ -229,6 +235,8 @@ export function Workspace({ problem }: { problem: CodingProblemDetail }) {
             data-testid="input-code"
             className="block h-[380px] w-full resize-y overflow-auto whitespace-pre bg-background p-4 font-mono-ui text-[13px] leading-relaxed outline-none"
           />
+          {isRemoteLanguage(language) ? <p className="border-t border-border px-4 py-2 font-mono-ui text-[10px] text-muted-foreground" data-testid="text-remote-hint">{LANGUAGE_LABELS[language] ?? language} runs on the Judge0 code runner. A run can take a few seconds.</p> : null}
+          {!isSql ? (
           <div className="border-t border-border px-4 py-3">
             <label className="flex cursor-pointer items-center gap-2 text-xs font-semibold text-muted-foreground">
               <input type="checkbox" checked={useCustom} onChange={(e) => setUseCustom(e.target.checked)} data-testid="checkbox-custom-input" />
@@ -236,6 +244,7 @@ export function Workspace({ problem }: { problem: CodingProblemDetail }) {
             </label>
             {useCustom ? <textarea value={customInput} onChange={(e) => setCustomInput(e.target.value)} spellCheck={false} data-testid="input-custom" className="mt-3 h-24 w-full rounded-lg border border-border bg-background p-3 font-mono-ui text-xs outline-none focus:ring-2 focus:ring-primary/30" /> : null}
           </div>
+          ) : null}
           <div className="flex items-center justify-end gap-3 border-t border-border bg-muted/40 px-4 py-3">
             <button type="button" onClick={run} disabled={busy} data-testid="button-run" className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-bold transition-colors hover:bg-muted disabled:opacity-60">
               {runMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />} Run
@@ -250,8 +259,8 @@ export function Workspace({ problem }: { problem: CodingProblemDetail }) {
           <div className="rounded-2xl border border-border bg-card p-5 shadow-sm" data-testid="panel-results">
             {busy ? <p className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> {runMutation.isPending ? 'Running your code...' : 'Judging against all test cases...'}</p> : null}
             {error && !busy ? <p className="rounded-lg bg-red-500/8 p-3 text-sm font-semibold text-red-700 dark:text-red-400" data-testid="text-run-error">{error}</p> : null}
-            {!busy && !error && panel === 'run' && runResult ? <RunPanel result={runResult} /> : null}
-            {!busy && !error && panel === 'submit' && submitResult ? <SubmitPanel result={submitResult} /> : null}
+            {!busy && !error && panel === 'run' && runResult ? <RunPanel result={runResult} sql={isSql} /> : null}
+            {!busy && !error && panel === 'submit' && submitResult ? <SubmitPanel result={submitResult} sql={isSql} /> : null}
           </div>
         ) : null}
       </section>

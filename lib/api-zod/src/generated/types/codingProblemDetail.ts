@@ -19,6 +19,8 @@ export interface CodingProblemDetail {
   outputFormat: string;
   constraints: string;
   timeLimitMs: number;
+  /** program (stdin/stdout) or sql (query result) */
+  kind: string;
   languages: string[];
   starterCode: CodingProblemDetailStarterCode;
   samples: CodingSample[];
