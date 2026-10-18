@@ -16,6 +16,7 @@ import ContestsPage from '@/pages/contests';
 import LeaderboardPage from '@/pages/leaderboard';
 import SettingsPage from '@/pages/settings';
 import CodingPage from '@/pages/coding';
+import EngineeringPage from '@/pages/engineering';
 import CodingProblemPage from '@/pages/coding-problem';
 import {
   Redirect,
@@ -161,6 +162,9 @@ function Router() {
         </Route>
         <Route path="/leaderboard">
           <ProtectedRoute><LeaderboardPage /></ProtectedRoute>
+        </Route>
+        <Route path="/engineering">
+          <ProtectedRoute><EngineeringPage /></ProtectedRoute>
         </Route>
         <Route path="/coding">
           <ProtectedRoute><CodingPage /></ProtectedRoute>
