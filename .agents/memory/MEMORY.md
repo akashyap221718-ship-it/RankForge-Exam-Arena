@@ -1,0 +1,1 @@
+- [Confirmed RankForge publishing URL](rankforge-published-domain.md) — User confirmed the current workspace URL is the intended publishing target.

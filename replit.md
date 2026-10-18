@@ -4,12 +4,14 @@ RankForge is a competitive practice arena for government-job aspirants and engin
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
+- `pnpm install --frozen-lockfile` — install the workspace dependencies
+- Start `artifacts/rankforge-exam-arena: web` and `artifacts/api-server: API Server` in Replit Workflows for the local app and API (ports 21213 and 8080)
+- `pnpm --filter @workspace/db run push` — apply the Drizzle schema to the development database only
+- `pnpm --filter @workspace/scripts run seed-coding` — seed the programming and SQL practice problems in the development database
+- `PORT=21213 BASE_PATH=/ pnpm --filter @workspace/rankforge-exam-arena run build` — build the web app outside its production workflow
+- `pnpm --filter @workspace/api-server run build` — build the API server
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- Replit provides `DATABASE_URL`; do not copy a database connection string into project files
 
 ## Stack
 
@@ -32,7 +34,7 @@ RankForge is a competitive practice arena for government-job aspirants and engin
 ## Architecture decisions
 
 - The product is organized around an exam-training loop: dashboard signal → focused set → scored attempt → visible rank feedback.
-- The first release uses seeded API data and in-memory attempt/contest state so the experience is usable immediately without account setup.
+- Exam practice data is seeded by the API; coding problems and test cases are seeded into the development database with `seed-coding`.
 - Frontend API calls use generated hooks from the OpenAPI contract rather than hand-written fetch calls.
 - Clerk is the managed authentication provider; the browser uses same-origin session cookies and the API validates sessions with Clerk middleware.
 - The visual system uses an indigo training-room foundation with brass rank signals, calibration-blue surfaces, and mono metadata to distinguish exam data from rewards.
